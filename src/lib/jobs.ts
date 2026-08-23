@@ -137,6 +137,7 @@ export async function fetchJobsPage(
     supabase.from('jobs').select(LIST_COLUMNS),
     { q, source, sort },
   )
+    .order('posted_at', { ascending, nullsFirst: false })
     .order('scraped_at', { ascending })
     .range(from, to);
 
@@ -167,6 +168,7 @@ export async function fetchJobs(): Promise<Job[]> {
       .from('jobs')
       .select(LIST_COLUMNS)
       .eq('is_active', true)
+      .order('posted_at', { ascending: false, nullsFirst: false })
       .order('scraped_at', { ascending: false })
       .range(page * PAGE, page * PAGE + PAGE - 1);
 
