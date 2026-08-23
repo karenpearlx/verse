@@ -57,7 +57,17 @@ export function parseSalary(salaryText) {
 function parseDate(raw) {
   const value = clean(raw);
   if (!value) return null;
-  const date = new Date(`${value} 12:00:00 UTC`);
+  // OLJ website shows dates like "Aug 23, 2026"
+  // OLJ API/mobile might show "2026-08-24 02:46:09"
+  const hasTime = /\d{2}:\d{2}:\d{2}/.test(value);
+  let date;
+  if (hasTime) {
+    // Full timestamp: "2026-08-24 02:46:09" -> ISO format
+    date = new Date(`${value.replace(' ', 'T')}Z`);
+  } else {
+    // Date only: "Aug 23, 2026" or "2026-08-23" -> add noon UTC
+    date = new Date(`${value} 12:00:00 UTC`);
+  }
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 

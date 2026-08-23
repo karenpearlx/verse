@@ -9,7 +9,7 @@
 
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { scrapeWWR } from './lib/wwr.mjs';
+import { scrapeUpwork } from './lib/upwork.mjs';
 import { extractJobSlugs, parseOLJJob } from './lib/olj.mjs';
 
 config({ path: new URL('../.env.local', import.meta.url) });
@@ -17,7 +17,7 @@ config({ path: new URL('../.env.local', import.meta.url) });
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const USER_AGENT = 'Mozilla/5.0 (compatible; AllyJobIndexer/1.0; +https://ally.ph)';
-const OLJ_LIMIT = Number.parseInt(process.env.OLJ_SCRAPE_LIMIT ?? '30', 10);
+const OLJ_LIMIT = Number.parseInt(process.env.OLJ_SCRAPE_LIMIT ?? '100', 10);
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   throw new Error('Missing Supabase URL or key. Configure .env.local before running the scraper.');
@@ -66,14 +66,41 @@ async function mapWithConcurrency(items, concurrency, worker) {
 
 async function scrapeOLJ() {
   console.log('Scraping OnlineJobs.ph detail pages...');
-  const searchUrl = 'https://www.onlinejobs.ph/jobseekers/search/c/virtual-assistant';
-  const searchHtml = await fetchText(searchUrl);
-  const slugs = extractJobSlugs(searchHtml).slice(0, OLJ_LIMIT);
+  const allSlugs = new Set();
+  const maxPages = Math.ceil(OLJ_LIMIT / 30); // OLJ shows ~30 per page
+  
+  for (let page = 1; page <= maxPages; page++) {
+    // OLJ uses offset-based pagination: /jobseekers/jobsearch, /jobseekers/jobsearch/30, /60, etc
+    const offset = (page - 1) * 30;
+    const searchUrl = offset === 0
+      ? 'https://www.onlinejobs.ph/jobseekers/jobsearch'
+      : `https://www.onlinejobs.ph/jobseekers/jobsearch/${offset}`;
+    try {
+      const searchHtml = await fetchText(searchUrl);
+      const pageSlugs = extractJobSlugs(searchHtml);
+      if (pageSlugs.length === 0) break;
+      const before = allSlugs.size;
+      pageSlugs.forEach(s => allSlugs.add(s));
+      // If no new slugs found, we've reached the end
+      if (allSlugs.size === before) break;
+      if (allSlugs.size >= OLJ_LIMIT) break;
+      // Small delay between pages to avoid rate limiting
+      if (page < maxPages) await new Promise(r => setTimeout(r, 300));
+    } catch (error) {
+      console.error(`OLJ page ${page} failed: ${error.message}`);
+      break;
+    }
+  }
+  
+  const slugs = [...allSlugs].slice(0, OLJ_LIMIT);
   console.log(`Found ${slugs.length} OLJ listings`);
 
-  const jobs = await mapWithConcurrency(slugs, 3, async (slug) => {
+  // Fetch detail pages one at a time with delay to avoid rate limiting
+  const jobs = await mapWithConcurrency(slugs, 1, async (slug, index) => {
     const jobUrl = `https://www.onlinejobs.ph/jobseekers/job/${slug}`;
     try {
+      // Add delay between requests (500ms to avoid 429s)
+      if (index > 0) await new Promise(r => setTimeout(r, 500));
       const html = await fetchText(jobUrl);
       return parseOLJJob(html, jobUrl, slug);
     } catch (error) {
@@ -133,9 +160,9 @@ async function saveJobs(jobs) {
 }
 
 async function main() {
-  console.log(`Starting Versified scraper at ${new Date().toISOString()}`);
-  const results = await Promise.allSettled([scrapeOLJ(), scrapeRemoteOK(), scrapeWWR()]);
-  const names = ['olj', 'remoteok', 'wwr'];
+  console.log(`Starting Ally scraper at ${new Date().toISOString()}`);
+  const results = await Promise.allSettled([scrapeOLJ(), scrapeRemoteOK(), scrapeUpwork()]);
+  const names = ['olj', 'remoteok', 'upwork'];
   const allJobs = [];
 
   results.forEach((result, index) => {
