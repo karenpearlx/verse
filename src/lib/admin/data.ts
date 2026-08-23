@@ -356,7 +356,7 @@ export const RUNS_TABLE = 'scraper_runs';
  * the console under-report OnlineJobs.ph by an order of magnitude.
  */
 const SOURCE_ALIASES: Record<string, string> = { onlinejobs: 'olj', 'onlinejobs.ph': 'olj' };
-export const KNOWN_SOURCES = ['olj', 'remoteok', 'upwork'] as const;
+export const KNOWN_SOURCES = ['olj', 'remoteok', 'wwr'] as const;
 
 export function normaliseSource(value: string | null | undefined) {
   if (!value) return null;
@@ -371,14 +371,13 @@ function aliasesFor(key: string) {
 const SOURCE_LABELS: Record<string, string> = {
   olj: 'OnlineJobs.ph',
   remoteok: 'RemoteOK',
-  upwork: 'Upwork',
+  wwr: 'We Work Remotely',
 };
 
 const SOURCE_NOTES: Record<string, string | null> = {
   olj: 'OnlineJobs.ph hides employer names from logged-out visitors, so company is stored as null.',
   remoteok: null,
-  upwork:
-    'Needs UPWORK_ACCESS_TOKEN. Upwork removed public job RSS in 2024, so an approved OAuth key for the GraphQL API is the only sanctioned route.',
+  wwr: 'RSS feeds for customer support, marketing, copywriting, data, exec, and finance categories.',
 };
 
 /** A run that never wrote a finish time is treated as dead after this long. */
@@ -442,7 +441,7 @@ export async function readScraper(db: SupabaseClient): Promise<ScraperResponse> 
         return {
           key,
           label: SOURCE_LABELS[key],
-          enabled: key === 'upwork' ? Boolean(process.env.UPWORK_ACCESS_TOKEN) : true,
+          enabled: true,
           note: SOURCE_NOTES[key],
           jobCount,
           activeCount,

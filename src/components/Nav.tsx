@@ -102,6 +102,7 @@ export default function Nav() {
           background: lifted ? "rgba(247,246,244,0.82)" : "transparent",
           backdropFilter: lifted ? "blur(12px)" : "none",
           borderBottom: `1px solid ${lifted ? "var(--color-line)" : "transparent"}`,
+          paddingTop: "env(safe-area-inset-top)",
         }}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:h-20 md:px-8">

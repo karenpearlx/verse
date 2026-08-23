@@ -93,13 +93,15 @@ export function formatPostedAt(job: Job) {
   if (!raw) return 'Recently';
   const then = new Date(raw);
   if (Number.isNaN(then.getTime())) return 'Recently';
-  const hours = Math.floor((Date.now() - then.getTime()) / 3_600_000);
-  const days = Math.floor(hours / 24);
-  if (hours < 1) return 'Just now';
+  const mins = Math.floor((Date.now() - then.getTime()) / 60_000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
   if (days === 1) return 'Yesterday';
   if (days < 7) return `${days}d ago`;
-  return then.toLocaleDateString();
+  return then.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 /**

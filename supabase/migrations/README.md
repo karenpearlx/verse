@@ -8,6 +8,8 @@ Apply these files **in filename order** against a fresh Supabase project (SQL ed
 | `20260301000001_admin_analytics_content.sql` | Admin, analytics, scraper runs, templates, categories |
 | `20260808000002_rate_limits.sql` | Durable API rate-limit counters |
 | `20260808000003_applications_status_saved.sql` | Ensure `applications.status` check includes `saved` |
+| `20260808000004_creator_applications.sql` | Creator apply form submissions |
+| `20260819000005_billing_paymongo.sql` | Pro billing columns, `activate_pro_checkout`, `consume_feature_use` |
 
 The same content is kept as editable references at:
 

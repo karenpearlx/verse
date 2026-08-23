@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/lib/AuthContext";
 
 /**
@@ -11,9 +12,8 @@ import { useAuth } from "@/lib/AuthContext";
  * Rendered once from the root layout, so it has to opt itself out of the routes
  * that own the whole viewport: the admin console and the auth screens.
  *
- * Height lives in one place: `--ally-bottomnav` (set in globals.css, switched on
- * by the `data-bottomnav` attribute below). The spacer at the end of this file
- * and the PWA install bar both read it, so nothing ends up underneath the bar.
+ * The fixed bar is portaled to document.body so a transformed ancestor (e.g.
+ * pull-to-refresh) cannot trap it mid-page. Height lives in `--ally-bottomnav`.
  */
 
 const HIDDEN_PREFIXES = [
@@ -127,6 +127,11 @@ export default function MobileNav() {
   const pathname = usePathname() ?? "/";
   const { status, user, ready } = useAuth();
   const hidden = HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Tell the document a bottom bar exists, so globals.css can hand out the
   // height to the spacer and to anything else pinned to the bottom.
@@ -139,61 +144,60 @@ export default function MobileNav() {
 
   if (hidden) return null;
 
-  // Only show signed-in tabs once auth is ready and user exists
-  // This prevents flickering between states
   const signedIn = ready && status === "in" && Boolean(user);
   const tabs = makeTabs(signedIn);
 
+  const bar = (
+    <nav
+      aria-label="Primary"
+      className="ally-bottomnav fixed inset-x-0 bottom-0 z-[60] md:hidden"
+      style={{
+        background: "rgba(255,255,255,0.94)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        borderTop: "1px solid var(--color-line)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+        boxShadow: "0 -8px 24px -20px rgba(28,26,23,0.5)",
+      }}
+    >
+      <ul className="mx-auto flex max-w-md items-stretch">
+        {tabs.map((tab) => {
+          const active = isActive(pathname, tab);
+          return (
+            <li key={tab.key} className="flex-1">
+              <Link
+                href={tab.href}
+                aria-current={active ? "page" : undefined}
+                className="flex h-[3.75rem] flex-col items-center justify-center gap-1 transition-colors active:scale-95 active:opacity-70"
+                style={{
+                  color: active ? "var(--color-accent-deep)" : "#6b6863",
+                  transition: "color 0.2s, transform 0.1s, opacity 0.1s",
+                }}
+              >
+                <span
+                  className="grid h-6 w-6 place-items-center transition-transform duration-200"
+                  style={{ transform: active ? "translateY(-1px)" : "none" }}
+                >
+                  {tab.icon(active)}
+                </span>
+                <span
+                  className="text-[0.6875rem] leading-none tracking-[0.01em]"
+                  style={{ fontWeight: active ? 700 : 500 }}
+                >
+                  {tab.label}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+
   return (
     <>
-      {/* Keeps footers and long pages clear of the bar. */}
       <div aria-hidden style={{ height: "var(--ally-bottomnav, 0px)" }} />
-
-      <nav
-        aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-30 md:hidden"
-        style={{
-          background: "rgba(255,255,255,0.92)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          borderTop: "1px solid var(--color-line)",
-          paddingBottom: "env(safe-area-inset-bottom)",
-          boxShadow: "0 -8px 24px -20px rgba(28,26,23,0.5)",
-        }}
-      >
-        <ul className="mx-auto flex max-w-md items-stretch">
-          {tabs.map((tab) => {
-            const active = isActive(pathname, tab);
-            return (
-              <li key={tab.key} className="flex-1">
-                <Link
-                  href={tab.href}
-                  aria-current={active ? "page" : undefined}
-                  className="flex h-[3.75rem] flex-col items-center justify-center gap-1 transition-colors active:scale-95 active:opacity-70"
-                  // Inactive is #6b6863, not --color-muted: at this label size
-                  // (10px) muted only reaches 4.27:1 on the bar's near-white,
-                  // under AA. This clears it at 5.5:1 and still reads secondary
-                  // next to the teal.
-                  style={{ color: active ? "var(--color-accent-deep)" : "#6b6863", transition: "color 0.2s, transform 0.1s, opacity 0.1s" }}
-                >
-                  <span
-                    className="grid h-6 w-6 place-items-center transition-transform duration-200"
-                    style={{ transform: active ? "translateY(-1px)" : "none" }}
-                  >
-                    {tab.icon(active)}
-                  </span>
-                  <span
-                    className="text-[0.6875rem] leading-none tracking-[0.01em]"
-                    style={{ fontWeight: active ? 700 : 500 }}
-                  >
-                    {tab.label}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      {mounted ? createPortal(bar, document.body) : null}
     </>
   );
 }

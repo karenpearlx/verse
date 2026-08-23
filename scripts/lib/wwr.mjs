@@ -36,8 +36,8 @@ function parseWWRRSS(xml) {
 
     if (!title || !link) continue;
 
-    // Extract job ID from URL
-    const jobIdMatch = link.match(/\/remote-jobs\/(\d+)/);
+    // Extract a stable id from the URL path (slug or numeric).
+    const jobIdMatch = link.match(/\/remote-jobs\/([^/?#]+)/);
     const jobId = jobIdMatch ? jobIdMatch[1] : link;
 
     // Parse company from title (format: "Company: Job Title")
@@ -49,11 +49,6 @@ function parseWWRRSS(xml) {
     const cleanDescription = description
       ? decodeHtmlEntities(description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim())
       : null;
-
-    // Check if worldwide/PH-friendly
-    const isWorldwide = region?.toLowerCase().includes('anywhere') || 
-                        region?.toLowerCase().includes('world') ||
-                        !region;
 
     jobs.push({
       source: 'wwr',
@@ -73,8 +68,6 @@ function parseWWRRSS(xml) {
       original_url: link,
       posted_at: pubDate ? new Date(pubDate).toISOString() : null,
       scraped_at: new Date().toISOString(),
-      // Extra field to help filter PH-friendly jobs
-      is_worldwide: isWorldwide,
     });
   }
 
@@ -131,23 +124,48 @@ export async function scrapeWWR() {
   const allJobs = [];
   const seenIds = new Set();
 
+  const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+
   for (const feedUrl of FEED_URLS) {
     try {
       const response = await fetch(feedUrl, {
         headers: {
           'User-Agent': USER_AGENT,
-          'Accept': 'application/rss+xml, application/xml, text/xml',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*',
         },
         redirect: 'follow',
         signal: AbortSignal.timeout(15_000),
       });
 
-      if (!response.ok) {
+      // Some category feeds 301 to a new path; Node reports the intermediate
+      // status if the follow fails, so try the Location once by hand.
+      let xml;
+      if (response.status >= 300 && response.status < 400) {
+        const next = response.headers.get('location');
+        if (!next) {
+          console.warn(`WWR feed returned ${response.status} for ${feedUrl}`);
+          continue;
+        }
+        const absolute = new URL(next, feedUrl).toString();
+        const redirected = await fetch(absolute, {
+          headers: {
+            'User-Agent': USER_AGENT,
+            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+          },
+          redirect: 'follow',
+          signal: AbortSignal.timeout(15_000),
+        });
+        if (!redirected.ok) {
+          console.warn(`WWR feed returned ${redirected.status} for ${absolute}`);
+          continue;
+        }
+        xml = await redirected.text();
+      } else if (!response.ok) {
         console.warn(`WWR feed returned ${response.status} for ${feedUrl}`);
         continue;
+      } else {
+        xml = await response.text();
       }
-
-      const xml = await response.text();
       const jobs = parseWWRRSS(xml);
 
       for (const job of jobs) {

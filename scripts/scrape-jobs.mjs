@@ -9,6 +9,7 @@
 
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import { scrapeWWR } from './lib/wwr.mjs';
 import { scrapeUpwork } from './lib/upwork.mjs';
 import { extractJobsFromSearch, parseOLJJob } from './lib/olj.mjs';
 
@@ -17,7 +18,7 @@ config({ path: new URL('../.env.local', import.meta.url) });
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const USER_AGENT = 'Mozilla/5.0 (compatible; AllyJobIndexer/1.0; +https://ally.ph)';
-const OLJ_LIMIT = Number.parseInt(process.env.OLJ_SCRAPE_LIMIT ?? '100', 10);
+const OLJ_LIMIT = Number.parseInt(process.env.OLJ_SCRAPE_LIMIT ?? '200', 10);
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   throw new Error('Missing Supabase URL or key. Configure .env.local before running the scraper.');
@@ -149,9 +150,40 @@ async function saveJobs(jobs) {
   if (!jobs.length) return;
   console.log(`Saving ${jobs.length} jobs...`);
 
+  // Only columns that exist on public.jobs — scrapers must not invent fields
+  // (PostgREST rejects the whole batch when an unknown key slips through).
+  const allowed = new Set([
+    'source',
+    'source_id',
+    'title',
+    'company',
+    'description',
+    'salary_min',
+    'salary_max',
+    'salary_currency',
+    'salary_type',
+    'skills',
+    'experience_level',
+    'job_type',
+    'location',
+    'is_remote',
+    'original_url',
+    'posted_at',
+    'scraped_at',
+    'is_active',
+  ]);
+
+  const rows = jobs.map((job) => {
+    const row = {};
+    for (const key of allowed) {
+      if (job[key] !== undefined) row[key] = job[key];
+    }
+    return row;
+  });
+
   // Small batches make a single malformed source record easier to diagnose.
-  for (let offset = 0; offset < jobs.length; offset += 100) {
-    const batch = jobs.slice(offset, offset + 100);
+  for (let offset = 0; offset < rows.length; offset += 100) {
+    const batch = rows.slice(offset, offset + 100);
     const { error } = await supabase.from('jobs').upsert(batch, {
       onConflict: 'source,source_id',
       ignoreDuplicates: false,
@@ -161,9 +193,16 @@ async function saveJobs(jobs) {
 }
 
 async function main() {
-  console.log(`Starting Ally scraper at ${new Date().toISOString()}`);
-  const results = await Promise.allSettled([scrapeOLJ(), scrapeRemoteOK(), scrapeUpwork()]);
-  const names = ['olj', 'remoteok', 'upwork'];
+  console.log(`Starting Verse scraper at ${new Date().toISOString()}`);
+  const tasks = [scrapeOLJ(), scrapeRemoteOK(), scrapeWWR()];
+  const names = ['olj', 'remoteok', 'wwr'];
+  // Upwork is optional — only when an access token is configured.
+  if (process.env.UPWORK_ACCESS_TOKEN?.trim()) {
+    tasks.push(scrapeUpwork());
+    names.push('upwork');
+  }
+
+  const results = await Promise.allSettled(tasks);
   const allJobs = [];
 
   results.forEach((result, index) => {

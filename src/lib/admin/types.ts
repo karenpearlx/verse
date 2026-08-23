@@ -52,7 +52,7 @@ export type AnalyticsResponse = {
 
 /* ------------------------------------------------------------------ scraper */
 
-export type ScraperSourceKey = 'olj' | 'remoteok' | 'upwork';
+export type ScraperSourceKey = 'olj' | 'remoteok' | 'wwr';
 export type ScraperSource = {
   key: ScraperSourceKey;
   label: string;
