@@ -78,7 +78,7 @@ function extractCompany($) {
   return candidate || null;
 }
 
-export function parseOLJJob(html, jobUrl, fallbackSlug = '') {
+export function parseOLJJob(html, jobUrl, fallbackSlug = '', postedAtOverride = null) {
   const $ = cheerio.load(html);
   const title = clean($('h1.job__title').first().text()) || clean($('h1').first().text()) || fallbackSlug
     .replace(/-\d+$/, '')
@@ -87,7 +87,9 @@ export function parseOLJJob(html, jobUrl, fallbackSlug = '') {
   const description = clean($('#job-description').first().text());
   const salary = parseSalary(labelValue($, 'WAGE / SALARY'));
   const workType = labelValue($, 'TYPE OF WORK');
-  const postedAt = parseDate(labelValue($, 'DATE UPDATED'));
+  // Use override timestamp from search page if available (has exact time)
+  // Otherwise fall back to detail page date (date only, no time)
+  const postedAt = postedAtOverride ? parseDate(postedAtOverride) : parseDate(labelValue($, 'DATE UPDATED'));
   const skills = $('.card-worker-topskill').map((_, node) => clean($(node).text())).get().filter(Boolean);
   const sourceId = $('#job-description').attr('data-jobid') ?? fallbackSlug.match(/(\d+)$/)?.[1] ?? fallbackSlug;
 
@@ -116,10 +118,34 @@ export function parseOLJJob(html, jobUrl, fallbackSlug = '') {
   };
 }
 
-export function extractJobSlugs(html) {
+/**
+ * Extract job slugs and their posted timestamps from the search results page.
+ * Returns array of { slug, postedAt } objects.
+ * The postedAt comes from data-temp-2 attribute (UTC time) on the search page.
+ */
+export function extractJobsFromSearch(html) {
   const $ = cheerio.load(html);
-  return [...new Set($('a[href*="/jobseekers/job/"]')
-    .map((_, node) => $(node).attr('href')?.match(/\/jobseekers\/job\/([\w-]+)/)?.[1])
-    .get()
-    .filter(Boolean))];
+  const jobs = new Map();
+  
+  // Each job card has a link and a nearby p with data-temp-2 for the UTC timestamp
+  $('a[href*="/jobseekers/job/"]').each((_, link) => {
+    const href = $(link).attr('href');
+    const slug = href?.match(/\/jobseekers\/job\/([\w-]+)/)?.[1];
+    if (!slug || jobs.has(slug)) return;
+    
+    // Find the timestamp - it's in a p with data-temp-2 within the same job card
+    const card = $(link).closest('.jobpost-cat-box, .latest-job-post, [class*="job"]');
+    const timestamp = card.find('[data-temp-2]').attr('data-temp-2') 
+      || $(link).parent().find('[data-temp-2]').attr('data-temp-2')
+      || $(link).siblings('[data-temp-2]').attr('data-temp-2');
+    
+    jobs.set(slug, { slug, postedAt: timestamp || null });
+  });
+  
+  return [...jobs.values()];
+}
+
+// Legacy function for backwards compatibility
+export function extractJobSlugs(html) {
+  return extractJobsFromSearch(html).map(j => j.slug);
 }

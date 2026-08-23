@@ -10,7 +10,7 @@
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { scrapeUpwork } from './lib/upwork.mjs';
-import { extractJobSlugs, parseOLJJob } from './lib/olj.mjs';
+import { extractJobsFromSearch, parseOLJJob } from './lib/olj.mjs';
 
 config({ path: new URL('../.env.local', import.meta.url) });
 
@@ -66,7 +66,7 @@ async function mapWithConcurrency(items, concurrency, worker) {
 
 async function scrapeOLJ() {
   console.log('Scraping OnlineJobs.ph detail pages...');
-  const allSlugs = new Set();
+  const allJobs = new Map(); // slug -> { slug, postedAt }
   const maxPages = Math.ceil(OLJ_LIMIT / 30); // OLJ shows ~30 per page
   
   for (let page = 1; page <= maxPages; page++) {
@@ -77,13 +77,13 @@ async function scrapeOLJ() {
       : `https://www.onlinejobs.ph/jobseekers/jobsearch/${offset}`;
     try {
       const searchHtml = await fetchText(searchUrl);
-      const pageSlugs = extractJobSlugs(searchHtml);
-      if (pageSlugs.length === 0) break;
-      const before = allSlugs.size;
-      pageSlugs.forEach(s => allSlugs.add(s));
-      // If no new slugs found, we've reached the end
-      if (allSlugs.size === before) break;
-      if (allSlugs.size >= OLJ_LIMIT) break;
+      const pageJobs = extractJobsFromSearch(searchHtml);
+      if (pageJobs.length === 0) break;
+      const before = allJobs.size;
+      pageJobs.forEach(j => { if (!allJobs.has(j.slug)) allJobs.set(j.slug, j); });
+      // If no new jobs found, we've reached the end
+      if (allJobs.size === before) break;
+      if (allJobs.size >= OLJ_LIMIT) break;
       // Small delay between pages to avoid rate limiting
       if (page < maxPages) await new Promise(r => setTimeout(r, 300));
     } catch (error) {
@@ -92,17 +92,18 @@ async function scrapeOLJ() {
     }
   }
   
-  const slugs = [...allSlugs].slice(0, OLJ_LIMIT);
-  console.log(`Found ${slugs.length} OLJ listings`);
+  const jobsToFetch = [...allJobs.values()].slice(0, OLJ_LIMIT);
+  console.log(`Found ${jobsToFetch.length} OLJ listings`);
 
   // Fetch detail pages one at a time with delay to avoid rate limiting
-  const jobs = await mapWithConcurrency(slugs, 1, async (slug, index) => {
+  const jobs = await mapWithConcurrency(jobsToFetch, 1, async ({ slug, postedAt }, index) => {
     const jobUrl = `https://www.onlinejobs.ph/jobseekers/job/${slug}`;
     try {
       // Add delay between requests (500ms to avoid 429s)
       if (index > 0) await new Promise(r => setTimeout(r, 500));
       const html = await fetchText(jobUrl);
-      return parseOLJJob(html, jobUrl, slug);
+      // Pass the exact timestamp from search page
+      return parseOLJJob(html, jobUrl, slug, postedAt);
     } catch (error) {
       console.error(`Skipping OLJ listing ${slug}: ${error.message}`);
       return null;
