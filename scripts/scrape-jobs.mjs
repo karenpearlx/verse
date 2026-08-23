@@ -99,8 +99,8 @@ async function scrapeOLJ() {
   const jobs = await mapWithConcurrency(jobsToFetch, 1, async ({ slug, postedAt }, index) => {
     const jobUrl = `https://www.onlinejobs.ph/jobseekers/job/${slug}`;
     try {
-      // Add delay between requests (500ms to avoid 429s)
-      if (index > 0) await new Promise(r => setTimeout(r, 500));
+      // Add delay between requests (1.5s to avoid 429s - OLJ is aggressive)
+      if (index > 0) await new Promise(r => setTimeout(r, 1500));
       const html = await fetchText(jobUrl);
       // Pass the exact timestamp from search page
       return parseOLJJob(html, jobUrl, slug, postedAt);
