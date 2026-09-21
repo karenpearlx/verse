@@ -147,7 +147,7 @@ export default function FollowUpWriter({ defaultName = '' }: { defaultName?: str
         <h2 className="font-display text-xl font-extrabold tracking-tight">What happened</h2>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <Field label="Your name" value={name} onChange={setName} placeholder="Karen Ong" />
+          <Field label="Your name" value={name} onChange={setName} placeholder="Maria Santos" />
           <Field label="Who you are writing to" hint="(optional)" value={contact} onChange={setContact} placeholder="Maddie" />
           <Field label="Role" value={role} onChange={setRole} placeholder="Operations Assistant" />
           <Field label="Company" value={company} onChange={setCompany} placeholder="Northwind" />

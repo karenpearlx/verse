@@ -10,6 +10,7 @@ const FREE_DEEP_SLUGS = new Set([
 ]);
 
 export const DEEP_COURSE_FLAGS: Record<string, { premium: boolean; previewCount: number }> = {
+  'ai-marketing-and-aeo': { premium: true, previewCount: 3 },
   'applications-that-get-replies': { premium: false, previewCount: 3 },
   'becoming-an-ops-lead': { premium: true, previewCount: 3 },
   'bookkeeping-basics': { premium: true, previewCount: 3 },
@@ -33,6 +34,7 @@ export const DEEP_COURSE_FLAGS: Record<string, { premium: boolean; previewCount:
 };
 
 const LOADERS: Record<string, () => Promise<{ default: DeepCourse }>> = {
+  'ai-marketing-and-aeo': () => import('./ai-marketing-and-aeo'),
   'applications-that-get-replies': () => import('./applications-that-get-replies'),
   'becoming-an-ops-lead': () => import('./becoming-an-ops-lead'),
   'bookkeeping-basics': () => import('./bookkeeping-basics'),

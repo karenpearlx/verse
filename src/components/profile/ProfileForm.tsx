@@ -666,7 +666,7 @@ export default function ProfileForm({
               className="field"
               value={draft.fullName}
               maxLength={PROFILE_LIMITS.maxName}
-              placeholder="Karen Ong"
+              placeholder="Maria Santos"
               onChange={(e) => set("fullName", e.target.value)}
             />
           </div>

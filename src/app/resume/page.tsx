@@ -31,31 +31,31 @@ type TemplateId = ResumeBuilderTemplateId;
 const STORE = 'ally-resume';
 
 const DEFAULTS: Data = {
-  name: 'Karen Ong',
-  title: 'Operations Lead / Executive Assistant',
-  location: 'Negros Occidental, Philippines · Works US hours',
+  name: 'Maria Santos',
+  title: 'Virtual Assistant / Executive Assistant',
+  location: 'Cebu, Philippines · Works US hours',
   email: 'you@example.com',
   phone: '+63 900 000 0000',
   summary:
     'Operations and executive support for small remote teams. I build the systems that keep a founder out of the weeds — inbox, calendar, reporting, and the people doing the work.',
   skills:
-    'Executive support, Inbox & calendar, SEO, Content ops, Notion, Asana, Reddit ops, VA management, Reporting',
+    'Executive support, Inbox & calendar, SEO, Content ops, Notion, Asana, Social media, Reporting',
   jobs: [
     {
       id: 'j1',
-      role: 'Operations Lead',
-      company: 'OGTool',
-      period: '2026 — present',
+      role: 'Executive Assistant',
+      company: 'Remote marketing agency (US)',
+      period: '2025 — present',
       bullets:
-        'Ran blog and content workflow for 9 client accounts.\nManaged 3 VAs across Reddit ops and posting.\n250 posts shipped with a 61% first-page win rate.',
+        'Ran inbox, calendar and travel for two founders across three time zones.\nBuilt the client-reporting workflow in Notion, cutting report day from 4 hours to 1.\nOnboarded and coordinated two junior VAs.',
     },
     {
       id: 'j2',
-      role: 'Senior SEO Manager',
-      company: 'Cascade Web Solutions',
-      period: '2024 — 2026',
+      role: 'General Virtual Assistant',
+      company: 'E-commerce client (AU)',
+      period: '2023 — 2025',
       bullets:
-        'Built operations for 30+ client accounts.\nGrew GBP interactions 762% for a local services client.\nMoved geogrid rank from 17.94 to 3.02.',
+        'Handled customer email and chat, keeping first reply under 2 hours.\nMaintained product listings and weekly sales reports.\nDocumented every recurring task into an SOP library the next hire could run from.',
     },
   ],
 };

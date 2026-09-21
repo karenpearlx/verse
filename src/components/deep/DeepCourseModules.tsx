@@ -8,7 +8,10 @@ const WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'ei
 
 type Props = {
   slug: string;
+  /** Only the modules this reader may see — locked bodies never reach the client. */
   modules: DeepCourseModule[];
+  /** Full module count for the course, for progress and upsell copy. */
+  totalCount: number;
   /** true when the track is paid and the reader has not unlocked it */
   locked: boolean;
   previewCount: number;
@@ -25,12 +28,14 @@ function storageKey(slug: string) {
 export default function DeepCourseModules({
   slug,
   modules,
+  totalCount,
   locked,
   previewCount,
   paid,
   priceLabel,
   premiumTrackCount,
 }: Props) {
+  // Defence in depth: the server already slices, but never show past the preview.
   const visible = useMemo(
     () => (locked ? modules.slice(0, previewCount) : modules),
     [locked, modules, previewCount],
@@ -71,9 +76,9 @@ export default function DeepCourseModules({
     [done, persist],
   );
 
-  const completed = done.filter((n) => modules.some((m) => m.n === n)).length;
-  const pct = modules.length ? Math.round((completed / modules.length) * 100) : 0;
-  const remaining = modules.length - visible.length;
+  const completed = done.filter((n) => n >= 1 && n <= totalCount).length;
+  const pct = totalCount ? Math.round((completed / totalCount) * 100) : 0;
+  const remaining = totalCount - visible.length;
 
   // The module bodies are pre-rendered HTML, so the copy buttons inside them are
   // wired with one delegated listener. That survives any re-render of the markup.
@@ -125,14 +130,14 @@ export default function DeepCourseModules({
     return () => root.removeEventListener('click', onClick);
   }, []);
 
-  const heading = `The ${WORD[modules.length] ?? modules.length} modules`;
+  const heading = `The ${WORD[totalCount] ?? totalCount} modules`;
 
   return (
     <section id="modules" className="scroll-mt-32" ref={rootRef}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2 className="font-display text-[1.75rem] font-semibold text-ink">{heading}</h2>
         <p className="text-[0.8125rem] tabular-nums text-muted">
-          {hydrated ? completed : 0} of {modules.length} done
+          {hydrated ? completed : 0} of {totalCount} done
         </p>
       </div>
 

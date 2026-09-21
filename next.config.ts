@@ -19,6 +19,8 @@ const securityHeaders = [
       // Next requires inline/eval in some runtimes; tighten later if nonces land.
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://api.anthropic.com https://api.paymongo.com",
+      // Course pages embed YouTube lessons (privacy-enhanced player only).
+      "frame-src 'self' https://www.youtube-nocookie.com",
       "worker-src 'self'",
       "manifest-src 'self'",
       "object-src 'none'",

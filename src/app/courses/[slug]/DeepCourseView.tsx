@@ -7,7 +7,7 @@ import DeepCourseQuiz from '@/components/deep/DeepCourseQuiz';
 import type { DeepCourse, DeepCourseWrapper } from '@/lib/deep-course-types';
 import { premiumDeepCourseCount } from '@/lib/deep-courses';
 
-const PRICE_LABEL = '₱199/mo';
+const PRICE_LABEL = '₱199 for 30 days';
 
 /** Rebuild the layout elements the interactive section originally sat inside. */
 function withWrappers(wrappers: DeepCourseWrapper[] | undefined, children: ReactNode): ReactNode {
@@ -21,6 +21,11 @@ function withWrappers(wrappers: DeepCourseWrapper[] | undefined, children: React
 export default function DeepCourseView({ course, paid }: { course: DeepCourse; paid: boolean }) {
   const locked = course.premium && !paid;
   const premiumTrackCount = premiumDeepCourseCount();
+  // Locked bodies must never reach the browser — not even hidden in the RSC
+  // payload — so the module list is cut down on the server, and the client
+  // component only receives the count of what it cannot show.
+  const visibleModules = locked ? course.modules.slice(0, course.previewCount) : course.modules;
+  const totalModuleCount = course.modules.length;
   const modulesChunkIndex = course.chunks.findIndex(
     (chunk) => chunk.kind === 'slot' && chunk.value === 'MODULES',
   );
@@ -51,7 +56,8 @@ export default function DeepCourseView({ course, paid }: { course: DeepCourse; p
                   chunk.wrappers,
                   <DeepCourseModules
                     slug={course.slug}
-                    modules={course.modules}
+                    modules={visibleModules}
+                    totalCount={totalModuleCount}
                     locked={locked}
                     previewCount={course.previewCount}
                     paid={paid}
