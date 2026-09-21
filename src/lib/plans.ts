@@ -55,8 +55,8 @@ export const PLANS: Plan[] = [
     id: 'pro',
     name: 'Pro',
     price: `₱${PRO_PRICE_PESOS}`,
-    cadence: 'per month',
-    blurb: 'For the month you are actually applying. Nothing counts down while you work.',
+    cadence: 'for 30 days',
+    blurb: 'For the month you are actually applying. Prepaid — no auto-renew, nothing counts down while you work.',
     featured: true,
     features: [
       'Unlimited cover letters',

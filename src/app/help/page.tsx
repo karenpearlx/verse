@@ -32,7 +32,7 @@ const FAQ: Entry[] = [
     q: "Is Verse free?",
     a: [
       "The job board, unlimited application tracking, the rate check and the free course tracks cost nothing, with no trial timer and no card.",
-      "Pro is ₱199 a month and unlocks the three advanced course tracks plus higher limits on the resume and cover letter builders. Verse never takes a cut of your pay and is not an agency, so there is no placement fee either way.",
+      "Pro is ₱199 for 30 days (prepaid, no auto-renew) and unlocks every premium course plus unlimited resume and cover letter use. Pay with GCash, Maya, or card. Verse never takes a cut of your pay and is not an agency, so there is no placement fee either way.",
     ],
   },
   {

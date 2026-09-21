@@ -7,11 +7,14 @@ import {
   DEFAULT_DAYS,
   STORE,
   STORE_DAYS,
+  STORE_SEEN,
   daysSince,
+  markFollowUpsSeen,
   overdue,
   readApps,
   readFollowUpDays,
   subscribeApps,
+  unseenFollowUps,
 } from "@/lib/followups";
 import { usePreferences } from "@/lib/usePreferences";
 
@@ -20,7 +23,7 @@ import { usePreferences } from "@/lib/usePreferences";
  *  be a primitive — returning a fresh array here would loop forever. */
 function snapshot() {
   try {
-    return `${localStorage.getItem(STORE) ?? ""}|${localStorage.getItem(STORE_DAYS) ?? ""}`;
+    return `${localStorage.getItem(STORE) ?? ""}|${localStorage.getItem(STORE_DAYS) ?? ""}|${localStorage.getItem(STORE_SEEN) ?? ""}`;
   } catch {
     return "";
   }
@@ -69,10 +72,11 @@ export default function FollowUpBell({
 
   const { inAppNotifications } = usePreferences();
   const raw = useSyncExternalStore(subscribeApps, snapshot, serverSnapshot);
-  const { days, list } = useMemo(() => {
-    if (raw === null) return { days: DEFAULT_DAYS, list: [] };
+  const { days, list, unread } = useMemo(() => {
+    if (raw === null) return { days: DEFAULT_DAYS, list: [] as ReturnType<typeof overdue>, unread: 0 };
     const d = readFollowUpDays();
-    return { days: d, list: overdue(readApps(), d) };
+    const due = overdue(readApps(), d);
+    return { days: d, list: due, unread: unseenFollowUps(due).length };
   }, [raw]);
 
   // Close on navigation. Tracked as previous-props state rather than an effect
@@ -82,6 +86,11 @@ export default function FollowUpBell({
     setLastPath(pathname);
     setOpen(false);
   }
+
+  useEffect(() => {
+    if (!open) return;
+    markFollowUpsSeen(list.map((a) => a.id));
+  }, [open, list]);
 
   useEffect(() => {
     if (!open) return;
@@ -112,9 +121,12 @@ export default function FollowUpBell({
 
   const shown = open && !forceClosed && inAppNotifications;
   const count = list.length;
-  const label = count
-    ? `Follow-ups, ${count} waiting`
-    : "Follow-ups, nothing waiting";
+  const badge = unread;
+  const label = badge
+    ? `Follow-ups, ${badge} waiting`
+    : count
+      ? "Follow-ups, caught up on reminders"
+      : "Follow-ups, nothing waiting";
 
   // Notifications off: the header goes quiet entirely. The tracker still flags
   // stale applications, so nothing is actually lost. Placed after every hook so
@@ -136,11 +148,11 @@ export default function FollowUpBell({
         style={{
           border: "1px solid var(--color-line-2)",
           background: shown ? "var(--color-paper-2)" : "var(--color-surface)",
-          color: count ? "var(--color-accent-deep)" : "var(--color-ink-2)",
+          color: badge ? "var(--color-accent-deep)" : "var(--color-ink-2)",
         }}
       >
-        <BellIcon ringing={count > 0} />
-        {count > 0 && (
+        <BellIcon ringing={badge > 0} />
+        {badge > 0 && (
           <span
             aria-hidden
             className="absolute grid place-items-center rounded-full text-[0.625rem] font-bold tabular-nums"
@@ -155,7 +167,7 @@ export default function FollowUpBell({
               border: "2px solid var(--color-paper)",
             }}
           >
-            {count > 9 ? "9+" : count}
+            {badge > 9 ? "9+" : badge}
           </span>
         )}
       </button>

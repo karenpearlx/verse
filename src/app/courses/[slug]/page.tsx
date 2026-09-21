@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Lessons from "@/components/Lessons";
@@ -13,9 +14,17 @@ import { createClient } from "@/lib/supabase/server";
 import { hasPaidAccess, readSubscription } from "@/lib/subscription";
 import { getDeepCourse } from "@/lib/deep-courses";
 import { COURSES_INDEX } from "@/lib/deep-courses/index-meta";
+import {
+  courseUnlockCookieName,
+  hasCourseUnlockCookie,
+  isValidCourseUnlockAccess,
+} from "@/lib/course-unlock";
 import DeepCourseView from "./DeepCourseView";
 
-type Params = { params: Promise<{ slug: string }> };
+type Params = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ access?: string; unlock?: string }>;
+};
 
 /**
  * Premium lesson bodies must not reach a free browser, so the whole page is
@@ -23,7 +32,7 @@ type Params = { params: Promise<{ slug: string }> };
  */
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: Params) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const deep = await getDeepCourse(slug);
   if (deep) {
@@ -58,8 +67,15 @@ function Head({ eyebrow, title, note }: { eyebrow: string; title: string; note?:
   );
 }
 
-export default async function CoursePage({ params }: Params) {
+export default async function CoursePage({ params, searchParams }: Params) {
   const { slug } = await params;
+  const query = await searchParams;
+
+  // Marketplace secret link: /courses/seo-specialist?access=SECRET → set cookie, open forever.
+  if (query.access && isValidCourseUnlockAccess(slug, query.access)) {
+    redirect(`/api/course-unlock?slug=${encodeURIComponent(slug)}&access=${encodeURIComponent(query.access)}`);
+  }
+
   const deep = await getDeepCourse(slug);
 
   const supabase = await createClient();
@@ -67,7 +83,10 @@ export default async function CoursePage({ params }: Params) {
     data: { user },
   } = await supabase.auth.getUser();
   const account = user ? await readSubscription(supabase, user.id) : null;
-  const paid = Boolean(account && hasPaidAccess(account));
+  const pro = Boolean(account && hasPaidAccess(account));
+  const jar = await cookies();
+  const unlocked = hasCourseUnlockCookie(slug, jar.get(courseUnlockCookieName(slug))?.value);
+  const paid = pro || unlocked;
 
   // The written tracks are the main course library. Everything below is the
   // older niche-track renderer, kept so those slugs still resolve.

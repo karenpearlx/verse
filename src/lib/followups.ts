@@ -24,6 +24,8 @@ export type App = {
 
 export const STORE = 'ally-applications';
 export const STORE_DAYS = 'ally-followup-days';
+/** Overdue app ids the user has already opened in the bell. Badge stays clear until a new one appears. */
+export const STORE_SEEN = 'ally-followup-seen';
 export const DEFAULT_DAYS = 5;
 
 /** Fired on `window` after the tracker writes, so same-tab listeners update.
@@ -80,6 +82,34 @@ export function overdue(apps: App[], days: number): App[] {
     .sort((a, b) => a.appliedAt.localeCompare(b.appliedAt)); // oldest, most embarrassing, first
 }
 
+export function readSeenFollowUps(): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(STORE_SEEN) ?? '[]');
+    return new Set(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []);
+  } catch {
+    return new Set();
+  }
+}
+
+/** Mark every currently overdue application as seen so the badge clears. */
+export function markFollowUpsSeen(ids: string[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    const next = JSON.stringify([...new Set(ids)].sort());
+    if (localStorage.getItem(STORE_SEEN) === next) return;
+    localStorage.setItem(STORE_SEEN, next);
+  } catch {
+    /* ignore quota / private mode */
+  }
+  announceAppsChanged();
+}
+
+export function unseenFollowUps(overdueApps: App[]): App[] {
+  const seen = readSeenFollowUps();
+  return overdueApps.filter((a) => !seen.has(a.id));
+}
+
 export function announceAppsChanged() {
   if (typeof window === 'undefined') return;
   window.dispatchEvent(new Event(APPS_CHANGED));
@@ -89,7 +119,7 @@ export function announceAppsChanged() {
 export function subscribeApps(fn: () => void) {
   if (typeof window === 'undefined') return () => {};
   const onStorage = (e: StorageEvent) => {
-    if (e.key === null || e.key === STORE || e.key === STORE_DAYS) fn();
+    if (e.key === null || e.key === STORE || e.key === STORE_DAYS || e.key === STORE_SEEN) fn();
   };
   window.addEventListener(APPS_CHANGED, fn);
   window.addEventListener('storage', onStorage);

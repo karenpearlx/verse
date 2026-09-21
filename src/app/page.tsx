@@ -46,7 +46,7 @@ export default async function Home() {
       ? { display: trackedLabel, to: Math.floor(jobCount / 100) * 100, suffix: "+", label: "listings tracked" }
       : { display: "Live", label: "listings tracked" },
     { display: "3", to: 3, label: "job sources merged" },
-    { display: "FREE", label: "to use it" },
+    { display: "₱199", label: "Pro for 30 days" },
   ];
 
   return (
@@ -246,7 +246,7 @@ export default async function Home() {
           <SectionHead
             eyebrow="What VAs say"
             title="Coming from real people"
-            sub="Verse launched recently. This section fills up with actual users, or it stays empty."
+            sub="Quoted with permission. More land here as people write in."
           />
           <div className="mt-14 md:mt-20">
             <Testimonials />

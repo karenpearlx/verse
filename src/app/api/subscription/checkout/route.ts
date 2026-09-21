@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
     const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
     const origin = configured ? new URL(configured).origin : new URL(request.url).origin;
-    const reference = `ALLY-PRO-${user.id}-${Date.now()}`;
+    const reference = `VERSE-PRO-${user.id}-${Date.now()}`;
     const payload = await paymongoRequest<{
       data?: { id?: string; attributes?: { checkout_url?: string } };
     }>('/v2/checkout_sessions', {

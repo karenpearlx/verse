@@ -139,9 +139,9 @@ export default function ScraperSection() {
                 ))}
               </p>
               <p className="mt-2">
-                These use a source key this app never writes. That normally means an older deployment still has a
-                cron pointed at the same Supabase project. Worth finding and switching off, otherwise the two
-                keep overwriting each other.
+                These use a source name Verse does not scrape today (for example an old Indeed import). Stale
+                leftovers are harmless. Only worry if a weird source keeps getting <em>new</em> listings —
+                that can mean another old cron is still pointed at this same database.
               </p>
             </Note>
           ) : null}

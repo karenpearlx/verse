@@ -455,18 +455,19 @@ export async function readScraper(db: SupabaseClient): Promise<ScraperResponse> 
     // it usually means a second deployment is still writing to this database.
     const accounted = sources.reduce((sum, source) => sum + source.jobCount, 0);
     if (totalJobs > accounted) {
-      const known = KNOWN_SOURCES.flatMap(aliasesFor);
+      const known = new Set(KNOWN_SOURCES.flatMap(aliasesFor));
       const { data } = await db
         .from('jobs')
         .select('source,scraped_at')
-        .not('source', 'in', `(${known.join(',')})`)
         .order('scraped_at', { ascending: false })
-        .limit(2_000);
-      const rows = (data ?? []) as { source: string; scraped_at: string | null }[];
-      strays = tally(rows, (row) => row.source).map(([source, jobCount]) => ({
+        .limit(5_000);
+      const rows = ((data ?? []) as { source: string; scraped_at: string | null }[]).filter(
+        (row) => !known.has(normaliseSource(row.source) ?? ''),
+      );
+      strays = tally(rows, (row) => normaliseSource(row.source) ?? row.source).map(([source, jobCount]) => ({
         source,
         jobCount,
-        lastScrapedAt: rows.find((row) => row.source === source)?.scraped_at ?? null,
+        lastScrapedAt: rows.find((row) => (normaliseSource(row.source) ?? row.source) === source)?.scraped_at ?? null,
       }));
     }
   } catch (error) {

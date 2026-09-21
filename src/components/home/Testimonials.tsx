@@ -5,18 +5,24 @@ import PointerCard from "../PointerCard";
 /**
  * Testimonials.
  *
- * DELIBERATELY EMPTY. Verse is new and has no real users to quote yet, and
- * inventing quotes on a page that also promises "we never sit between you and
- * the client" would poison the one thing the product is selling. So the section
- * ships with an honest early-days panel instead of placeholder people.
- *
- * To turn it on: drop real, permitted quotes into QUOTES and the layout swaps
- * itself. Name + role + city, exactly as the person agreed to be credited.
+ * Real, permitted quotes only. Name + role + city, exactly as the person
+ * agreed to be credited. Empty QUOTES falls back to an honest early-days panel.
  */
 
 type Quote = { body: string; name: string; role: string; place?: string };
 
-const QUOTES: Quote[] = [];
+const QUOTES: Quote[] = [
+  {
+    body: "I got my first direct client here!! I had to learn SEO first which took a few days, but it was worth it!",
+    name: "Christhia A.",
+    role: "SEO course",
+  },
+  {
+    body: "Nasa college pa ako but I really wanted to learn more about Web development. The course was sufficient, and it gave me enough para makapag start akong mag create ng sites by myself.",
+    name: "Queen J.",
+    role: "Web development course",
+  },
+];
 
 function Mark() {
   return (
@@ -61,8 +67,15 @@ export default function Testimonials() {
     );
   }
 
+  const cols =
+    QUOTES.length === 1
+      ? "mx-auto max-w-xl"
+      : QUOTES.length === 2
+        ? "mx-auto max-w-4xl md:grid-cols-2"
+        : "md:grid-cols-3";
+
   return (
-    <div className="grid gap-5 md:grid-cols-3 md:gap-6">
+    <div className={`grid gap-5 md:gap-6 ${cols}`}>
       {QUOTES.map((q, i) => (
         <Reveal key={q.name} delay={i * 90} className="h-full">
           <PointerCard as="article" className="card lift flex h-full flex-col p-7 md:p-8">

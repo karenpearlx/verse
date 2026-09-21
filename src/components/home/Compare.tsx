@@ -25,7 +25,7 @@ function newItems(jobs?: string) {
       : "One feed with every VA job we can find, refreshed through the day",
     "Unlimited applications tracked, with follow-up nudges",
     "A rate calculator with market-range estimates from collected listings",
-    "Short structured courses — free tracks plus Pro specialisms — written by working VAs",
+    "Short structured courses — free tracks plus Pro specialisms (SEO, web, and more) at ₱199 for 30 days",
   ];
 }
 
