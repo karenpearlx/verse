@@ -875,7 +875,7 @@ export default function ProfileForm({
               className="field"
               value={draft.location}
               maxLength={PROFILE_LIMITS.maxLocation}
-              placeholder="San Carlos City, Negros Occidental"
+              placeholder="Cebu City, Philippines"
               onChange={(e) => set("location", e.target.value)}
             />
           </div>

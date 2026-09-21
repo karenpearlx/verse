@@ -107,7 +107,7 @@ const SECTIONS: LegalSection[] = [
     id: "law",
     title: "Governing law",
     paragraphs: [
-      "These terms are governed by the laws of the Republic of the Philippines, and disputes belong to the courts of Negros Occidental. Talk to us first, though. Most things get sorted by email.",
+      "These terms are governed by the laws of the Republic of the Philippines, and disputes belong to the proper courts of the Philippines. Talk to us first, though. Most things get sorted by email.",
     ],
   },
   {

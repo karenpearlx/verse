@@ -84,7 +84,7 @@ for (const [vname, width, height, touch] of [
   await page.fill('#listing', 'We are hiring an SEO Manager to own keyword research in Ahrefs and Semrush for our Shopify store. Contact Marco to apply.');
   await page.waitForTimeout(300);
   ok(`${vname}: niche auto-matched to SEO`, await page.getByRole('radio', { name: /SEO/ }).getAttribute('aria-checked') === 'true');
-  await page.fill('#n', 'Karen Ong');
+  await page.fill('#n', 'Maria Santos');
   await page.getByRole('button', { name: 'Write my letter' }).click();
   await page.waitForTimeout(500);
   const letter = await page.inputValue('#letter');
