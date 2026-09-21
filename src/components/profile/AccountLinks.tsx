@@ -115,15 +115,15 @@ export default function AccountLinks({ account }: { account: SubscriptionAccount
           <span className="block h-px" style={{ background: 'var(--color-line)' }} />
 
           <Row
-            href="/pricing"
+            href={paid ? '/settings' : '/pricing'}
             title="Plan & billing"
             badge={{ text: tierLabel(account.subscription_tier), good: paid }}
             note={
               paid
                 ? ends
-                  ? `Access runs to ${ends}. Cancel or change it here.`
-                  : 'Manage or cancel your plan.'
-                : 'What is included free, and what ₱199 a month adds.'
+                  ? `Prepaid access runs to ${ends}. Details in settings.`
+                  : 'See your plan in settings.'
+                : 'What is included free, and what ₱199 for 30 days adds.'
             }
             icon={
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none">

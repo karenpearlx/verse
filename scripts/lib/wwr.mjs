@@ -3,7 +3,7 @@
  * Uses their RSS feeds for remote jobs.
  */
 
-const USER_AGENT = 'Mozilla/5.0 (compatible; VersifiedJobIndexer/1.0)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; VerseJobIndexer/1.0)';
 
 // WWR RSS feed URLs - focusing on VA-relevant categories
 const FEED_URLS = [

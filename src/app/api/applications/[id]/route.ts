@@ -1,4 +1,5 @@
 import { ApiError, apiError, readJson, requireActiveUser, requireUser, stringField, urlField, uuidField } from '@/lib/api';
+import { FREE_SAVED_JOB_LIMIT, hasPaidAccess, readSubscription } from '@/lib/subscription';
 
 const STATUSES = ['saved', 'applied', 'follow_up', 'interviewing', 'offer', 'accepted', 'rejected', 'withdrawn'] as const;
 
@@ -51,6 +52,23 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     const { supabase, user } = await requireActiveUser();
     const { id } = await context.params;
     const patch = editableFields(await readJson(request));
+
+    // Moving a row into "saved" counts against the free limit exactly like
+    // creating one there — otherwise create-as-applied-then-flip bypasses it.
+    if (patch.status === 'saved') {
+      const [{ data: current, error: currentError }, account, { count, error: countError }] = await Promise.all([
+        supabase.from('applications').select('status').eq('id', uuidField(id)).eq('user_id', user.id).maybeSingle(),
+        readSubscription(supabase, user.id),
+        supabase.from('applications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'saved'),
+      ]);
+      if (currentError) throw currentError;
+      if (countError) throw countError;
+      const alreadySaved = current?.status === 'saved';
+      if (!alreadySaved && !hasPaidAccess(account) && (count ?? 0) >= FREE_SAVED_JOB_LIMIT) {
+        throw new ApiError(403, `Free plans can save up to ${FREE_SAVED_JOB_LIMIT} jobs. Upgrade to Pro for unlimited saved jobs.`);
+      }
+    }
+
     const { data, error } = await supabase
       .from('applications')
       .update(patch)

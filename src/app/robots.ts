@@ -17,7 +17,6 @@ export default function robots(): MetadataRoute.Robots {
           "/analytics",
           "/auth/",
           "/offline",
-          "/uxfixture-analytics",
         ],
       },
     ],

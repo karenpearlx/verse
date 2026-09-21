@@ -133,6 +133,17 @@ function AdminIcon() {
 
 export function AccountMenu({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
+  // Hash-based allowlist check is async; the link just appears a tick later.
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    isClientAdminEmail(user.email).then((ok) => {
+      if (alive) setIsAdmin(ok);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [user.email]);
   const wrap = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -257,7 +268,7 @@ export function AccountMenu({ user }: { user: User }) {
           Plans &amp; pricing
         </Link>
 
-        {isClientAdminEmail(user.email) ? (
+        {isAdmin ? (
           <Link
             href="/admin"
             role="menuitem"

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const { supabase, user, email } = await requireAdmin();
     const hash = hashFor(request);
     const { error } = await supabase.from('analytics_exclusions').upsert({
-      ip_hash: hash, label: 'Karen admin device', created_by: user.id,
+      ip_hash: hash, label: 'Admin device', created_by: user.id,
     });
     if (error) throw error;
     const audit = await recordAudit(supabase, {

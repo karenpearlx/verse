@@ -56,7 +56,23 @@ export default function Nav() {
   // header never shows a private link to someone who turns out to be a visitor.
   // Only show signed-in nav once auth is ready
   const signedIn = ready && status === "in" && Boolean(user);
-  const isAdmin = signedIn && isClientAdminEmail(user?.email);
+  // Async because the allowlist is hash-based (no readable emails in the
+  // bundle). The link simply appears a tick later for admins.
+  const [isAdmin, setIsAdmin] = useState(false);
+  const email = signedIn ? user?.email : null;
+  useEffect(() => {
+    let alive = true;
+    if (!email) {
+      setIsAdmin(false);
+      return;
+    }
+    isClientAdminEmail(email).then((ok) => {
+      if (alive) setIsAdmin(ok);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [email]);
   const links = signedIn ? [DASHBOARD, ...LINKS] : LINKS;
   const sheetLinks = signedIn
     ? [...SHEET_LINKS, ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : [])]

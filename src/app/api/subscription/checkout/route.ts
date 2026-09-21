@@ -32,7 +32,7 @@ export async function POST(request: Request) {
             cancel_url: `${origin}/pricing?checkout=cancelled`,
             customer_email: user.email,
             billing: { email: user.email, name: user.user_metadata?.full_name || user.email.split('@')[0] },
-            description: 'Verse Pro monthly access',
+            description: 'Verse Pro — 30 days prepaid, no auto-renew',
             reference_number: reference,
             send_email_receipt: true,
             show_description: true,

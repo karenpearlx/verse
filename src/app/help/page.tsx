@@ -63,7 +63,7 @@ const FAQ: Entry[] = [
   {
     q: "How do I cancel Pro?",
     a: [
-      "Profile, then Plans and pricing. Pro is prepaid for a fixed window rather than auto-renewing, so cancelling stops the next charge and you keep access until the date shown on that page.",
+      "There is nothing to cancel — Pro is prepaid for 30 days and never auto-renews, so no future charge exists. Your access simply runs to the date shown in Settings, and you only pay again if you choose to.",
     ],
   },
 ];

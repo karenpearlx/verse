@@ -8,7 +8,7 @@ import { PRO_ACCESS_DAYS, PRO_PRICE_PESOS } from '@/lib/plans';
 
 export const metadata = {
   title: 'Pricing — Verse',
-  description: `Free plan for the board, tracker and rate check. Pro is ₱${PRO_PRICE_PESOS} a month for unlimited letters, exports and premium courses.`,
+  description: `Free plan for the board, tracker and rate check. Pro is ₱${PRO_PRICE_PESOS} for 30 days, prepaid — unlimited letters, exports and premium courses.`,
 };
 
 const FAQ = [
@@ -23,6 +23,10 @@ const FAQ = [
   {
     q: `Why ${FREE_COVER_LETTER_LIMIT} letters and ${FREE_RESUME_LIMIT} exports?`,
     a: 'It is enough to run a real application round and decide whether Verse is worth paying for. It is not a trial that ends on a date, so an account you opened last year still has its allowance today.',
+  },
+  {
+    q: 'Do the AI features need anything extra?',
+    a: 'The AI-written letters and interview feedback run on your own OpenAI or Anthropic API key, pasted once in the tool settings. It stays in your browser and is only relayed to your provider when you generate — Verse never stores it. The template letter writer, and everything else in Pro, needs no key at all.',
   },
   {
     q: 'Can I get paid to teach here?',

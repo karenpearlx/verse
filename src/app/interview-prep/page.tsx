@@ -75,7 +75,7 @@ export default async function InterviewPrepPage() {
               Pro
             </span>
             <span>{paid ? 'Included in your plan' : 'Included with Verse Pro'}</span>
-            <span>Your answers never leave your device</span>
+            <span>Practice answers stay on your device; grading sends that answer to your AI provider</span>
           </div>
         </div>
       </section>

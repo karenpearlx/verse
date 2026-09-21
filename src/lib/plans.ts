@@ -2,10 +2,10 @@
  * Plan copy, in one place.
  *
  * The numbers here are display copy only. Every limit is enforced server side
- * (consume_feature_use for letters and exports, RLS for saved jobs), so nothing
- * on this page is load bearing for access. It just has to agree with the
- * constants in subscription.ts, which is why it imports them instead of
- * restating them.
+ * (consume_feature_use for letters and exports, the applications API routes
+ * for saved jobs), so nothing on this page is load bearing for access. It just
+ * has to agree with the constants in subscription.ts, which is why it imports
+ * them instead of restating them.
  */
 
 import { CONTACT_EMAIL } from './contact';

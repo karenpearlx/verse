@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 const SECTIONS: LegalSection[] = [
   {
-    id: "what-ally-is",
+    id: "what-verse-is",
     title: "What Verse is",
     paragraphs: [
       "Verse is a set of tools for Filipino virtual assistants: a job board pulled from public listings, a cover letter and resume builder, an application tracker, a rate checker, and lessons. A free plan covers the core tools; Pro is optional paid access for higher limits and premium courses.",

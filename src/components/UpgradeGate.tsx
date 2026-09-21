@@ -59,7 +59,7 @@ export default function UpgradeGate({
         {signedIn ? (
           <>
             <Link href="/pricing" className="btn btn-primary">
-              See Pro, ₱{PRO_PRICE_PESOS} a month
+              See Pro, ₱{PRO_PRICE_PESOS} for 30 days
             </Link>
             <Link href="/jobs" className="btn btn-ghost">
               Back to the board
