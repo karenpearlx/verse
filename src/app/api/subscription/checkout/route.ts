@@ -27,7 +27,7 @@ export async function POST(request: Request) {
               currency: 'PHP',
               quantity: 1,
             }],
-            payment_method_types: ['card', 'gcash', 'paymaya'],
+            payment_method_types: ['qrph', 'card', 'gcash', 'paymaya'],
             success_url: `${origin}/settings?checkout=success`,
             cancel_url: `${origin}/pricing?checkout=cancelled`,
             customer_email: user.email,
