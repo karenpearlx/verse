@@ -51,12 +51,11 @@ export async function GET(request: Request) {
     return NextResponse.json(
       { ...result, earlyAccess },
       {
-        headers: {
-          // Pro responses contain early listings and must never be shared.
-          'Cache-Control': earlyAccess
-            ? 'private, no-store'
-            : 'public, s-maxage=30, stale-while-revalidate=60',
-        },
+        // Never shared-cache this route: Vercel's CDN keys on the URL, not on
+        // cookies, so a cached free response would be served to Pro users and
+        // silently hide their early-access listings (verified live: HIT after
+        // one anonymous request). The query is head-count cheap; skip caching.
+        headers: { 'Cache-Control': 'private, no-store' },
       },
     );
   } catch (error) {
