@@ -6,6 +6,8 @@ export interface Job {
   salary_max: number | null;
   salary_currency: string | null;
   salary_type: string | null;
+  /** The salary exactly as the original listing wrote it. Preferred for display. */
+  salary_raw?: string | null;
   skills: string[] | null;
   experience_level: string | null;
   source: string;
@@ -76,6 +78,10 @@ export function displayCompany(job: Job) {
 }
 
 export function formatSalary(job: Job) {
+  // Show the client's own wording when we have it — reformatting a salary is
+  // how a "$2/hr" listing ends up displayed as "$320/mo".
+  const raw = job.salary_raw?.replace(/\s+/g, ' ').trim();
+  if (raw) return raw.length > 60 ? `${raw.slice(0, 57)}…` : raw;
   if (!job.salary_min && !job.salary_max) return null;
   const cur = job.salary_currency ?? 'USD';
   const symbol = cur === 'PHP' ? '₱' : cur === 'USD' ? '$' : `${cur} `;

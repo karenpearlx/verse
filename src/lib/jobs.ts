@@ -33,7 +33,14 @@ function jobsClient() {
 }
 
 const LIST_COLUMNS =
-  'id,title,company,salary_min,salary_max,salary_currency,salary_type,skills,experience_level,source,original_url,location,is_remote,posted_at,scraped_at';
+  'id,title,company,salary_min,salary_max,salary_currency,salary_type,salary_raw,skills,experience_level,source,original_url,location,is_remote,posted_at,scraped_at';
+
+/** Until the salary_raw migration has been run, selecting it 404s the board. */
+const LEGACY_LIST_COLUMNS = LIST_COLUMNS.replace('salary_raw,', '');
+
+function isMissingSalaryRaw(error: { message?: string } | null) {
+  return Boolean(error?.message && /salary_raw/.test(error.message));
+}
 
 export type JobSort = 'newest' | 'oldest' | 'paid';
 
@@ -133,7 +140,7 @@ export async function fetchJobsPage(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, error } = await applyFilters(
+  let { data, error } = await applyFilters(
     supabase.from('jobs').select(LIST_COLUMNS),
     { q, source, sort },
   )
@@ -141,6 +148,15 @@ export async function fetchJobsPage(
     .order('scraped_at', { ascending })
     .range(from, to);
 
+  if (error && isMissingSalaryRaw(error)) {
+    ({ data, error } = await applyFilters(
+      supabase.from('jobs').select(LEGACY_LIST_COLUMNS),
+      { q, source, sort },
+    )
+      .order('posted_at', { ascending, nullsFirst: false })
+      .order('scraped_at', { ascending })
+      .range(from, to));
+  }
   if (error) throw error;
 
   const counts = Object.fromEntries(countEntries) as Record<string, number>;
@@ -164,14 +180,27 @@ export async function fetchJobs(): Promise<Job[]> {
   const all: Job[] = [];
 
   for (let page = 0; page < 10; page++) {
-    const { data, error } = await jobsClient()
+    const result = await jobsClient()
       .from('jobs')
       .select(LIST_COLUMNS)
       .eq('is_active', true)
       .order('posted_at', { ascending: false, nullsFirst: false })
       .order('scraped_at', { ascending: false })
       .range(page * PAGE, page * PAGE + PAGE - 1);
+    let data = result.data as Job[] | null;
+    let error = result.error;
 
+    if (error && isMissingSalaryRaw(error)) {
+      const retry = await jobsClient()
+        .from('jobs')
+        .select(LEGACY_LIST_COLUMNS)
+        .eq('is_active', true)
+        .order('posted_at', { ascending: false, nullsFirst: false })
+        .order('scraped_at', { ascending: false })
+        .range(page * PAGE, page * PAGE + PAGE - 1);
+      data = retry.data as Job[] | null;
+      error = retry.error;
+    }
     if (error) throw error;
     if (!data?.length) break;
     all.push(...(data as Job[]));

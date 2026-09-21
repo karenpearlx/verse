@@ -45,6 +45,8 @@ const SKILL_MAP: { keys: string[]; label: string }[] = [
 ];
 
 const AI_STORE = 'ally-ai-settings-v1';
+/** Name, years and pitch, saved locally so returning users don't retype them. */
+const YOU_STORE = 'ally-letter-you-v1';
 type Provider = 'openai' | 'anthropic';
 
 const STOP = new Set(['the','and','for','with','you','are','our','your','will','who','this','that','have','from','their','been','they','all','can','has','not','but','out','use','using','work','role','team','job','about','into','more','than','when','what','a','an','to','of','in','on','is','be','we','it','as','at','or','by','if']);
@@ -172,6 +174,34 @@ function CoverLetter() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reading a browser-only store on mount
     if (restored) setAi(restored);
   }, []);
+
+  // "You" fields persist across sessions: fill them once, every later visit
+  // starts pre-filled. Saved only after the first read so an empty first
+  // render can't wipe what a previous session stored.
+  const youRestored = useRef(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(YOU_STORE);
+      if (raw) {
+        const saved = JSON.parse(raw) as { name?: string; years?: string; headline?: string };
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- reading a browser-only store on mount
+        if (typeof saved.name === 'string' && saved.name) setName(saved.name);
+        if (typeof saved.years === 'string' && saved.years) setYears(saved.years);
+        if (typeof saved.headline === 'string' && saved.headline) setHeadline(saved.headline);
+      }
+    } catch {
+      /* corrupt storage shouldn't take the page down */
+    }
+    youRestored.current = true;
+  }, []);
+  useEffect(() => {
+    if (!youRestored.current) return;
+    try {
+      localStorage.setItem(YOU_STORE, JSON.stringify({ name, years, headline }));
+    } catch {
+      /* storage blocked; the session still works */
+    }
+  }, [name, years, headline]);
 
   /**
    * Arriving from a job card.
@@ -690,7 +720,7 @@ function CoverLetter() {
                 <label htmlFor="n" className="mb-1.5 block text-sm font-medium">
                   Your name
                 </label>
-                <input id="n" className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Karen Ong" />
+                <input id="n" className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" />
               </div>
               <div>
                 <label htmlFor="y" className="mb-1.5 block text-sm font-medium">
@@ -711,7 +741,7 @@ function CoverLetter() {
                   className="field"
                   value={headline}
                   onChange={(e) => setHeadline(e.target.value)}
-                  placeholder="I've run ops for a 12-person agency for three years."
+                  placeholder="One line about what you do best"
                 />
               </div>
               <div>

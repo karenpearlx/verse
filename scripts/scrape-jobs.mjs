@@ -162,6 +162,7 @@ async function saveJobs(jobs) {
     'salary_max',
     'salary_currency',
     'salary_type',
+    'salary_raw',
     'skills',
     'experience_level',
     'job_type',
@@ -183,11 +184,20 @@ async function saveJobs(jobs) {
 
   // Small batches make a single malformed source record easier to diagnose.
   for (let offset = 0; offset < rows.length; offset += 100) {
-    const batch = rows.slice(offset, offset + 100);
-    const { error } = await supabase.from('jobs').upsert(batch, {
+    let batch = rows.slice(offset, offset + 100);
+    let { error } = await supabase.from('jobs').upsert(batch, {
       onConflict: 'source,source_id',
       ignoreDuplicates: false,
     });
+    // Databases that haven't run the salary_raw migration yet should still
+    // scrape — drop the column and retry rather than failing the whole run.
+    if (error && /salary_raw/.test(error.message)) {
+      batch = batch.map(({ salary_raw: _dropped, ...rest }) => rest);
+      ({ error } = await supabase.from('jobs').upsert(batch, {
+        onConflict: 'source,source_id',
+        ignoreDuplicates: false,
+      }));
+    }
     if (error) throw new Error(`Supabase upsert failed: ${error.message}`);
   }
 }

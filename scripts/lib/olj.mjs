@@ -85,7 +85,8 @@ export function parseOLJJob(html, jobUrl, fallbackSlug = '', postedAtOverride = 
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
   const description = clean($('#job-description').first().text());
-  const salary = parseSalary(labelValue($, 'WAGE / SALARY'));
+  const salaryText = labelValue($, 'WAGE / SALARY');
+  const salary = parseSalary(salaryText);
   const workType = labelValue($, 'TYPE OF WORK');
   // Use override timestamp from search page if available (has exact time)
   // Otherwise fall back to detail page date (date only, no time)
@@ -107,6 +108,9 @@ export function parseOLJJob(html, jobUrl, fallbackSlug = '', postedAtOverride = 
     salary_max: salary.max,
     salary_currency: salary.currency,
     salary_type: salary.type,
+    // The listing's own wording, shown verbatim on the board so Verse never
+    // misquotes a client's budget.
+    salary_raw: salaryText || null,
     skills: skills.length ? skills : ['Virtual Assistant'],
     experience_level: /senior|lead|manager|director|head of/i.test(`${title} ${description}`) ? 'senior' : /no experience|entry.level|beginner/i.test(description) ? 'entry' : 'mid',
     job_type: /part[ -]?time/i.test(workType) ? 'part-time' : /full[ -]?time/i.test(workType) ? 'full-time' : clean(workType).toLowerCase() || null,
