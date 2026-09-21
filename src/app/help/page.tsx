@@ -92,15 +92,6 @@ const FIXES: Fix[] = [
     ],
   },
   {
-    symptom: "Where did Upwork go?",
-    cause:
-      "Upwork turned down the API access Verse applied for, so there is no sanctioned way to sync their listings. Rather than leave a filter that could only ever be empty, it was removed.",
-    steps: [
-      "We Work Remotely took its place in the source dropdown and posts a lot of the same remote roles.",
-      "Upwork is still worth checking directly. Verse just cannot mirror it.",
-    ],
-  },
-  {
     symptom: "A course module is locked",
     cause:
       "The advanced tracks give you three modules free, then ask for Pro. Or you are signed out and progress is not being read.",
