@@ -16,7 +16,7 @@ export type SubscriptionAccount = {
 export const FREE_COVER_LETTER_LIMIT = 10;
 export const FREE_RESUME_LIMIT = 10;
 export const FREE_SAVED_JOB_LIMIT = 20;
-export const PRO_PRICE_CENTAVOS = 100; // temp ₱1 for live payment testing — set back to 19_900
+export const PRO_PRICE_CENTAVOS = 19_900;
 
 export const DEFAULT_SUBSCRIPTION: SubscriptionAccount = {
   subscription_tier: 'free',
