@@ -242,7 +242,8 @@ export async function POST(request: Request) {
       subject: user.id,
       limit: 10,
       windowSeconds: 60 * 60,
-      message: 'Resume parse limit reached. Try again in an hour.',
+      message:
+        'You\u2019ve imported a few resumes this hour, so this cools down for an hour. You can still fill the form by hand in the meantime.',
     });
     await enforceRateLimit({
       bucket: 'ai-parse-resume-ip',

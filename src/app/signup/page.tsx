@@ -16,7 +16,7 @@ export default function Signup() {
           "Resume builder with templates made for remote VA roles",
           "Application tracker with status, notes, and links in one place",
           "Automatic follow-up reminders after five days",
-          "Alerts when a job lands inside your rate range",
+          "Job matches picked for your niches on your dashboard",
         ],
       }}
       footer={

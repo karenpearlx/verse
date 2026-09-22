@@ -11,7 +11,7 @@ import DeepCourseIndex from "@/components/deep/DeepCourseIndex";
 export const metadata = {
   title: "Courses — Verse",
   description:
-    "Twenty-one written VA tracks with worked examples, exercises, rate benchmarks, videos and a glossary — free foundations plus premium tracks for every specialism on the job board.",
+    "Twenty-one written VA courses with worked examples, exercises, rate benchmarks, videos and a glossary — free foundations plus premium courses for every skill on the job board.",
 };
 
 /** The lock state depends on the session, so this page is never cached. */

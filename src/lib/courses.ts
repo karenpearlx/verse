@@ -550,7 +550,7 @@ const BASE_COURSES: Course[] = [
   {
     slug: 'seo-for-vas',
     niche: 'seo',
-    tag: 'Specialism',
+    tag: 'Career skill',
     title: 'SEO for Virtual Assistants',
     author: 'Guest instructor',
     blurb: 'The highest-paying skill on the board right now, taught from scratch.',

@@ -310,7 +310,7 @@ export default function JobsBoard() {
                   >
                     <option value="newest">Newest first</option>
                     <option value="oldest">Oldest first</option>
-                    <option value="paid">Rate listed only</option>
+                    <option value="paid">Only jobs that show pay</option>
                   </select>
                 </div>
               </div>
@@ -346,11 +346,14 @@ export default function JobsBoard() {
             {error && (
               <div className="card p-8 text-center">
                 <p className="font-display text-xl font-extrabold tracking-tight">
-                  Couldn&rsquo;t load the board
+                  The listings didn&rsquo;t load
                 </p>
                 <p className="mt-2 text-sm" style={{ color: 'var(--color-muted)' }}>
-                  {error}
+                  Usually a connection hiccup, not you. Give it another try.
                 </p>
+                <button type="button" className="btn btn-primary mt-5 !px-6 !py-2.5 !text-sm" onClick={() => void loadPage()}>
+                  Try again
+                </button>
               </div>
             )}
 

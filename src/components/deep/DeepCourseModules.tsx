@@ -252,17 +252,17 @@ export default function DeepCourseModules({
 
       {locked ? (
         <div className="mt-5 rounded-2xl border border-teal-pale bg-teal-wash/60 p-5 sm:p-6">
-          <p className="font-display text-lg font-semibold text-ink">The rest of this track is Pro</p>
+          <p className="font-display text-lg font-semibold text-ink">The rest of this course unlocks with Pro</p>
           <p className="mt-1.5 max-w-xl text-[0.9375rem] leading-relaxed text-ink-2">
             {remaining} more {remaining === 1 ? 'module' : 'modules'}, the worked examples, the rate tables and every
-            copy-paste template. Pro is {priceLabel} and covers all {premiumTrackCount} premium tracks.
+            copy-paste template. Pro is {priceLabel} and covers all {premiumTrackCount} premium courses.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5">
             <Link className="btn btn-primary !px-6 !py-3 !text-sm" href={paid ? '/settings' : '/pricing'}>
               Unlock with Pro
             </Link>
             <Link className="btn btn-ghost !px-6 !py-3 !text-sm" href="/courses">
-              Browse the free tracks
+              Browse the free courses
             </Link>
           </div>
         </div>

@@ -67,8 +67,11 @@ export default function UpgradeGate({
           </>
         ) : (
           <>
-            <Link href={`/login?next=${encodeURIComponent(next)}`} className="btn btn-primary">
-              Sign in
+            <Link href={`/signup?next=${encodeURIComponent(next)}`} className="btn btn-primary">
+              Create a free account
+            </Link>
+            <Link href={`/login?next=${encodeURIComponent(next)}`} className="btn btn-ghost">
+              Already have one? Sign in
             </Link>
             <Link href="/pricing" className="btn btn-ghost">
               What Pro includes

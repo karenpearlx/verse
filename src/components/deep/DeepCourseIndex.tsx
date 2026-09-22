@@ -109,9 +109,9 @@ export default function DeepCourseIndex({ paid }: { paid: boolean }) {
             </h1>
             <p className="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-ink-2">{COURSES_INDEX.lede}</p>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Pill tone="teal">{cards.length} tracks written</Pill>
-              <Pill tone="leaf">{freeCount} free tracks</Pill>
-              <Pill tone="clay">{proCount} Pro tracks</Pill>
+              <Pill tone="teal">{cards.length} written courses</Pill>
+              <Pill tone="leaf">{freeCount} free for everyone</Pill>
+              <Pill tone="clay">{proCount} unlock with Pro</Pill>
             </div>
           </div>
         </div>
@@ -119,6 +119,19 @@ export default function DeepCourseIndex({ paid }: { paid: boolean }) {
 
       <div className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
         <p className="max-w-2xl text-[0.9375rem] leading-relaxed text-ink-2">{COURSES_INDEX.intro}</p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-card p-6 shadow-tile sm:p-7">
+          <div className="max-w-xl">
+            <p className="font-display text-lg font-semibold text-ink">New to VA work? Start here.</p>
+            <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-2">
+              The Complete VA Starter is free and takes you from zero to your first paid client — most people begin
+              with it before picking a career skill.
+            </p>
+          </div>
+          <Link className="btn btn-primary !px-6 !py-3 !text-sm" href="/courses/complete-va-starter">
+            Start the free course
+          </Link>
+        </div>
 
         <ul className="mt-10 grid gap-5 lg:grid-cols-3">
           {cards.map((c) => (
@@ -129,11 +142,12 @@ export default function DeepCourseIndex({ paid }: { paid: boolean }) {
         {!paid ? (
           <div className="mt-10 rounded-2xl border border-teal-pale bg-teal-wash/60 p-6 sm:p-8">
             <p className="font-display text-lg font-semibold text-ink">
-              {proCount} of the {cards.length} tracks are Pro
+              {proCount} of the {cards.length} courses unlock with Pro
             </p>
             <p className="mt-1.5 max-w-2xl text-[0.9375rem] leading-relaxed text-ink-2">
-              You can read the first three modules of each one for nothing. Pro is ₱199/mo and opens every module, every
-              worked example, the rate tables and all the copy-paste templates.
+              You can read the first three modules of each one for free, so you know exactly what you are getting. Pro
+              is ₱199 for 30 days (no auto-renew) and opens every module, every worked example, the rate tables and all
+              the copy-paste templates.
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
               <Link className="btn btn-primary !px-6 !py-3 !text-sm" href="/pricing">

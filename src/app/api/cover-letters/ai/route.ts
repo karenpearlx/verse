@@ -107,7 +107,8 @@ export async function POST(request: Request) {
       subject: user.id,
       limit: 20,
       windowSeconds: 60 * 60,
-      message: 'Cover letter AI limit reached. Try again in an hour.',
+      message:
+        'You\u2019ve written a lot of AI letters this hour — nice pace. To keep things fair for everyone, this cools down for an hour. Template mode still works right now.',
     });
     await enforceRateLimit({
       bucket: 'ai-cover-letter-ip',

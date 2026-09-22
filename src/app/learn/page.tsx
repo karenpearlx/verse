@@ -63,7 +63,7 @@ const FAQ = [
   },
   {
     q: "Is this free?",
-    a: "Starter tracks are free. Premium specialisms are on Pro. Verse makes nothing off placements and never sits between you and a client.",
+    a: "The starter lessons are free. The full career-skill courses are on Pro. Verse makes nothing off placements and never sits between you and a client.",
   },
 ];
 
@@ -82,6 +82,10 @@ export default function Learn() {
           <p className="lede mt-5 max-w-xl">
             Short, practical lessons written by VAs who actually did it. No ₱15,000 bootcamp, no
             recruiter upsell at the end.
+          </p>
+          <p className="mt-3 max-w-xl text-[0.9375rem]" style={{ color: "var(--color-muted)" }}>
+            These free lessons are the warm-up. The full written courses — with exercises, rate
+            tables and portfolio pieces — live in <Link href="/courses" className="underline underline-offset-2">Courses</Link>.
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3">
@@ -141,7 +145,7 @@ export default function Learn() {
                   </Link>
                 ) : (
                   <p className="mt-6 text-sm" style={{ color: "var(--color-faint)" }}>
-                    Written next
+                    Coming soon — we&rsquo;re writing this one now
                   </p>
                 )}
               </article>

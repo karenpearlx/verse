@@ -38,7 +38,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   // Where the user was headed before we bounced them here (e.g. /settings).
   // Same-origin paths only — an open redirect is not a feature.
   const requestedNext = params.get("next");
-  const next = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/tracker";
+  // Default landing is the dashboard: it explains itself to a brand-new
+  // account, unlike the tracker's empty board.
+  const next = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/dashboard";
   const isSignup = mode === "signup";
 
   const [fullName, setFullName] = useState("");
@@ -104,7 +106,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           return;
         }
         setNotice(
-          `Account created. Check ${email} for a confirmation link — you'll need it before you can sign in.`,
+          `Account created. Check ${email} for a confirmation link — you'll need it before you can sign in. No email after a few minutes? Check your spam folder, and make sure the address above is spelled right.`,
         );
         setPassword("");
       } else {

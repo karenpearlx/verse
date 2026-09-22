@@ -19,7 +19,7 @@ const FAQ: Item[] = [
     q: "Is Verse really free?",
     a: [
       "There is a free plan and a Pro plan. Free covers the job board, unlimited application tracking, the rate calculator, basic courses, and limited cover letters and resume exports — no trial timer and no card to start.",
-      "Pro is ₱199 for 30 days, prepaid (no auto-renew). It unlocks unlimited letters and exports, every premium course (SEO, AI marketing, web development, and the other specialisms), new jobs 24 hours early, interview prep and the follow-up writer. The AI-written letters and graded interview feedback use your own OpenAI or Anthropic key; everything else needs nothing extra. Pay with GCash, Maya, or card through PayMongo. Verse never takes a cut of your pay and is not an agency, so there is no placement fee either way.",
+      "Pro is ₱199 for 30 days, prepaid (no auto-renew). It unlocks unlimited letters and exports, every premium course (SEO, AI marketing, web development, and the rest), new jobs 24 hours early, interview prep and the follow-up writer. The AI-written letters and graded interview feedback use your own OpenAI or Anthropic key; everything else needs nothing extra. Pay with GCash, Maya, or card through PayMongo. Verse never takes a cut of your pay and is not an agency, so there is no placement fee either way.",
     ],
   },
   {

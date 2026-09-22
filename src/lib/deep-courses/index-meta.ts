@@ -7,8 +7,8 @@ export type DeepCourseCard = {
 
 export const COURSES_INDEX = {
   heading: "Learn one skill properly.",
-  lede: "Pick the one thing you want to be known for. Every track takes you from \u201cnever done it\u201d to \u201ccan show a client proof\u201d — in plain English, at your own pace.",
-  intro: "Every track works the same way: short modules you can finish in one sitting, a worked example so you see it done before you try it, an exercise that becomes a portfolio piece, honest rate numbers, and a plain-words glossary for the jargon in job ads. The three foundation tracks are free for everyone; Pro opens the specialisms.",
+  lede: "Pick the one thing you want to be known for. Every course takes you from \u201cnever done it\u201d to \u201ccan show a client proof\u201d — in plain English, at your own pace.",
+  intro: "Every course works the same way: short modules you can finish in one sitting, a worked example so you see it done before you try it, an exercise that becomes a portfolio piece, honest rate numbers, and a plain-words glossary for the jargon in job ads. The three foundation courses are free for everyone; Pro unlocks the rest.",
   cards: [
     {
       slug: "complete-va-starter", kicker: "Foundations", badge: "Free course", title: "The Complete VA Starter",
@@ -44,7 +44,7 @@ export const COURSES_INDEX = {
       duration: "3h 58m",
     },
     {
-      slug: "executive-assistant", kicker: "Specialism", badge: "Premium course", title: "Executive Assistant",
+      slug: "executive-assistant", kicker: "Career skill", badge: "Premium course", title: "Executive Assistant",
       blurb: "Run one busy person\u2019s work life — inbox, calendar, follow-ups — so well they stop checking behind you. The highest-trust VA role there is.",
       bullets: [
         "Inbox and calendar systems a founder will keep",
@@ -55,7 +55,7 @@ export const COURSES_INDEX = {
       duration: "4h 34m",
     },
     {
-      slug: "seo-specialist", kicker: "Specialism", badge: "Premium course", title: "SEO Specialist VA",
+      slug: "seo-specialist", kicker: "Career skill", badge: "Premium course", title: "SEO Specialist VA",
       blurb: "Learn how to get a business found on Google — the most reliably well-paid VA skill. You practice everything on one pretend coffee shop until you can do it for a real client.",
       bullets: [
         "A full website audit you can show as your portfolio",
@@ -66,7 +66,7 @@ export const COURSES_INDEX = {
       duration: "6h 39m",
     },
     {
-      slug: "ai-marketing-and-aeo", kicker: "Specialism", badge: "Premium course", title: "AI Marketing & AEO",
+      slug: "ai-marketing-and-aeo", kicker: "Career skill", badge: "Premium course", title: "AI Marketing & AEO",
       blurb: "Use ChatGPT and Claude like a pro — and learn AEO, the brand-new skill of getting a client mentioned inside AI answers, before most agencies figure it out.",
       bullets: [
         "Prompts that produce drafts you can actually use",
@@ -77,7 +77,7 @@ export const COURSES_INDEX = {
       duration: "4h 40m",
     },
     {
-      slug: "social-media-manager", kicker: "Specialism", badge: "Premium course", title: "Social Media Manager VA",
+      slug: "social-media-manager", kicker: "Career skill", badge: "Premium course", title: "Social Media Manager VA",
       blurb: "Run a brand\u2019s Facebook, Instagram and TikTok — and prove it\u2019s working — without quietly becoming their unpaid photographer, copywriter and crisis team.",
       bullets: [
         "A content calendar clients happily pay monthly for",
@@ -88,7 +88,7 @@ export const COURSES_INDEX = {
       duration: "5h 24m",
     },
     {
-      slug: "real-estate-va", kicker: "Specialism", badge: "Premium course", title: "Real Estate VA",
+      slug: "real-estate-va", kicker: "Career skill", badge: "Premium course", title: "Real Estate VA",
       blurb: "US agents pay well for someone who keeps their leads answered in minutes and their deals from falling apart in week three. Learn the job before your first interview.",
       bullets: [
         "The transaction timeline, explained like you\u2019re new",
@@ -99,7 +99,7 @@ export const COURSES_INDEX = {
       duration: "5h 42m",
     },
     {
-      slug: "ecommerce-va", kicker: "Specialism", badge: "Premium course", title: "E-commerce VA",
+      slug: "ecommerce-va", kicker: "Career skill", badge: "Premium course", title: "E-commerce VA",
       blurb: "Keep an online store running — orders, listings, stock, the where-is-my-order emails — and become the person who spots the problem before the refunds start.",
       bullets: [
         "Shopify and Amazon basics without the fluff",
@@ -121,7 +121,7 @@ export const COURSES_INDEX = {
       duration: "5h 1m",
     },
     {
-      slug: "customer-support", kicker: "Specialism", badge: "Premium course", title: "Customer Support VA",
+      slug: "customer-support", kicker: "Career skill", badge: "Premium course", title: "Customer Support VA",
       blurb: "Handle the conversations that decide whether a customer stays or leaves — the tone, the tools, and the numbers support leads are judged on.",
       bullets: [
         "Reply frameworks for angry, confused and quiet customers",
@@ -132,7 +132,7 @@ export const COURSES_INDEX = {
       duration: "4h 16m",
     },
     {
-      slug: "general-va", kicker: "Specialism", badge: "Premium course", title: "General Virtual Assistant",
+      slug: "general-va", kicker: "Career skill", badge: "Premium course", title: "General Virtual Assistant",
       blurb: "The all-rounder path: email, calendars, research, follow-ups. Learn to be the steady pair of hands a small team can\u2019t run a week without.",
       bullets: [
         "A daily rhythm that keeps every client\u2019s week on track",
@@ -143,7 +143,7 @@ export const COURSES_INDEX = {
       duration: "4h 16m",
     },
     {
-      slug: "data-and-research", kicker: "Specialism", badge: "Premium course", title: "Data Entry & Research VA",
+      slug: "data-and-research", kicker: "Career skill", badge: "Premium course", title: "Data Entry & Research VA",
       blurb: "Turn messy spreadsheets and open-web research into clean, source-backed data — and learn the speed tricks that let you charge per project, not per hour.",
       bullets: [
         "Google Sheets skills that triple your speed",
@@ -154,7 +154,7 @@ export const COURSES_INDEX = {
       duration: "4h 16m",
     },
     {
-      slug: "email-marketing", kicker: "Specialism", badge: "Premium course", title: "Email Marketing VA",
+      slug: "email-marketing", kicker: "Career skill", badge: "Premium course", title: "Email Marketing VA",
       blurb: "Learn the emails that make online stores money — welcome series, abandoned carts, campaigns — in Klaviyo and Mailchimp, the tools in every job ad.",
       bullets: [
         "Build the three flows every store needs",
@@ -165,7 +165,7 @@ export const COURSES_INDEX = {
       duration: "4h 16m",
     },
     {
-      slug: "sales-development", kicker: "Specialism", badge: "Premium course", title: "Sales & Lead Generation VA",
+      slug: "sales-development", kicker: "Career skill", badge: "Premium course", title: "Sales & Lead Generation VA",
       blurb: "Find the right people, write outbound messages that get answered, and book the sales call — the VA role closest to the money.",
       bullets: [
         "Build a clean prospect list from scratch",
@@ -176,7 +176,7 @@ export const COURSES_INDEX = {
       duration: "4h 2m",
     },
     {
-      slug: "web-and-no-code", kicker: "Specialism", badge: "Premium course", title: "Web Development & No-Code VA",
+      slug: "web-and-no-code", kicker: "Career skill", badge: "Premium course", title: "Web Development & No-Code VA",
       blurb: "Build and fix websites with Webflow, WordPress and just enough code to not panic. Clients pay more for the VA who solves it instead of reporting it.",
       bullets: [
         "Make safe changes to a live site without breaking it",
@@ -187,7 +187,7 @@ export const COURSES_INDEX = {
       duration: "4h 2m",
     },
     {
-      slug: "project-management", kicker: "Specialism", badge: "Premium course", title: "Project Management VA",
+      slug: "project-management", kicker: "Career skill", badge: "Premium course", title: "Project Management VA",
       blurb: "Keep client projects moving in Asana, ClickUp or Notion — who\u2019s doing what, by when, and what\u2019s stuck — without becoming the office nag.",
       bullets: [
         "Set up a project board a whole team actually uses",
@@ -198,7 +198,7 @@ export const COURSES_INDEX = {
       duration: "4h 2m",
     },
     {
-      slug: "graphic-design", kicker: "Specialism", badge: "Premium course", title: "Graphic Design VA",
+      slug: "graphic-design", kicker: "Career skill", badge: "Premium course", title: "Graphic Design VA",
       blurb: "Make brand graphics in Canva and Figma that look bought, not improvised — and survive the client feedback round without tears.",
       bullets: [
         "The fundamentals in plain words: spacing, type, colour",
@@ -209,7 +209,7 @@ export const COURSES_INDEX = {
       duration: "4h 2m",
     },
     {
-      slug: "writing-for-clients", kicker: "Specialism", badge: "Premium course", title: "Content Writer VA",
+      slug: "writing-for-clients", kicker: "Career skill", badge: "Premium course", title: "Content Writer VA",
       blurb: "Write blogs, emails and website copy clients happily pay for — with a brief-to-draft-to-edit process fast enough to still make the rate worth it.",
       bullets: [
         "A repeatable writing process, brief to final draft",
@@ -220,7 +220,7 @@ export const COURSES_INDEX = {
       duration: "4h 58m",
     },
     {
-      slug: "video-editing", kicker: "Specialism", badge: "Premium course", title: "Video Editing VA",
+      slug: "video-editing", kicker: "Career skill", badge: "Premium course", title: "Video Editing VA",
       blurb: "Edit reels, shorts and TikToks in CapCut and Premiere — hooks, captions, and the pace that keeps people watching past three seconds.",
       bullets: [
         "A start-to-finish short-form editing workflow",
@@ -231,7 +231,7 @@ export const COURSES_INDEX = {
       duration: "4h 58m",
     },
     {
-      slug: "bookkeeping-basics", kicker: "Specialism", badge: "Premium course", title: "Bookkeeping VA",
+      slug: "bookkeeping-basics", kicker: "Career skill", badge: "Premium course", title: "Bookkeeping VA",
       blurb: "Keep a small business\u2019s books clean in Xero and QuickBooks — invoices in, bills out, everything traceable — without pretending to be an accountant.",
       bullets: [
         "Debits and credits explained like a human",

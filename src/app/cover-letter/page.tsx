@@ -296,7 +296,7 @@ function CoverLetter() {
       const body = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) {
         setError(body?.error?.trim() || 'You have used all your free cover letters.');
-        setErrorLink({ href: '/pricing', label: 'See Pro' });
+        setErrorLink({ href: '/pricing', label: 'See what Pro includes (₱199)' });
         return;
       }
       writeTemplate();
@@ -395,7 +395,7 @@ function CoverLetter() {
         if (res.status === 401 && planStatus === 'signed-out') {
           setErrorLink({ href: '/login?next=/cover-letter', label: 'Sign in' });
         }
-        if (res.status === 403) setErrorLink({ href: '/pricing', label: 'See Pro' });
+        if (res.status === 403) setErrorLink({ href: '/pricing', label: 'See what Pro includes (₱199)' });
         throw new Error(
           payload.error ||
             (res.status === 401

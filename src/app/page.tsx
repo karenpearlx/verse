@@ -284,8 +284,8 @@ export default async function Home() {
                 <span style={{ color: "#5fd0bf" }}>.</span>
               </h2>
               <p className="mx-auto mt-5 max-w-md text-[0.9375rem] leading-relaxed" style={{ color: "#a9a6a1" }}>
-                Make an account to save jobs, track applications, and get alerts when something in
-                your range shows up.
+                Make an account to save jobs, track applications, and get a nudge when it&rsquo;s
+                time to follow up.
               </p>
               <div className="mt-9 flex flex-wrap justify-center gap-3">
                 <Link href="/signup" className="btn btn-primary">

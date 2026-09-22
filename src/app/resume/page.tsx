@@ -155,7 +155,7 @@ export default function Resume() {
         setExportError({
           text: body?.error?.trim() || 'You have used all your free resume exports.',
           href: '/pricing',
-          label: 'See Pro',
+          label: 'See what Pro includes (₱199)',
         });
         return;
       }
@@ -165,7 +165,7 @@ export default function Resume() {
       setExportError({
         text: 'Could not reach Verse, so the export was not counted. Try again.',
         href: '/pricing',
-        label: 'See Pro',
+        label: 'See what Pro includes (₱199)',
       });
     } finally {
       setExporting(false);
@@ -251,6 +251,10 @@ export default function Resume() {
           {/* form */}
           <div className="card p-6 md:p-8">
             <h2 className="font-display text-xl font-extrabold tracking-tight">Your details</h2>
+            <p className="mt-2 text-sm" style={{ color: 'var(--color-muted)' }}>
+              If you see sample details here, they&rsquo;re just to show how each field looks — replace
+              them with your own. Everything saves automatically as you type.
+            </p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <Input label="Full name" v={d.name} on={(v) => set('name', v)} />

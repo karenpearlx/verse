@@ -163,8 +163,8 @@ export default function DashboardView({
 
             {!appsReady && (
               <p className="mt-3 text-sm" style={{ color: 'var(--color-muted)' }}>
-                Your account cannot store applications yet, so these counts stay at zero. Anything you
-                add on /tracker is kept in this browser meanwhile.
+                We couldn&rsquo;t reach your saved applications just now, so these counts show zero.
+                Anything you add in the Tracker is kept safely on this device in the meantime.
               </p>
             )}
           </div>
@@ -206,7 +206,7 @@ export default function DashboardView({
 
               <p className="mt-4 text-[0.9375rem] leading-relaxed" style={{ color: 'var(--color-muted)' }}>
                 {!profileReady
-                  ? 'Your profile table has not been set up yet, so nothing here can save.'
+                  ? 'Your profile can\u2019t be saved right now — trouble on our side, not yours. Everything else still works. Try again in a few minutes.'
                   : missing.length === 0
                     ? `Nothing missing. ${rateLine(profile) || 'Rates set'} — clients see this version of you first.`
                     : `Still missing ${missing.slice(0, 3).join(', ')}${
@@ -271,7 +271,10 @@ export default function DashboardView({
             {jobs.length === 0 ? (
               <div className="card mt-4 px-6 py-12 text-center">
                 <p className="font-display text-lg font-extrabold tracking-tight">
-                  The board is not answering right now
+                  Job suggestions didn&rsquo;t load just now
+                </p>
+                <p className="mt-2 text-sm" style={{ color: 'var(--color-muted)' }}>
+                  The full board may still work fine.
                 </p>
                 <Link href="/jobs" className="btn btn-ghost mt-5">
                   Try the job board

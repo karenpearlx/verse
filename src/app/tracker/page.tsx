@@ -417,7 +417,7 @@ function Tracker() {
         <Nav />
         <div className="flex items-center justify-center pt-40">
           <div className="text-center">
-            <p style={{ color: 'var(--color-ink-2)' }}>Loading...</p>
+            <p style={{ color: 'var(--color-ink-2)' }}>One moment — taking you to sign in so your tracker can load.</p>
           </div>
         </div>
       </div>
@@ -877,7 +877,7 @@ function Tracker() {
             <p className="pt-2 text-center text-sm" style={{ color: 'var(--color-faint)' }}>
                 {cloud
                   ? 'Saved to your account. Same list on every device you sign in on.'
-                  : 'Saved in this browser for now — your account is not answering, so nothing here has synced.'}
+                  : 'Saved on this device for now — we couldn\u2019t reach your account, so this list hasn\u2019t synced yet. It will catch up on the next refresh.'}
               </p>
           </div>
         </section>

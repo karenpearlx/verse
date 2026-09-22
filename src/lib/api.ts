@@ -52,7 +52,10 @@ export async function consumeFeatureUse(
   } | null;
   if (!result?.allowed) {
     const label = feature === 'resume' ? 'resume exports' : 'cover letters';
-    throw new ApiError(403, `You've used all ${result?.usage_limit ?? 10} free ${label}. Upgrade to Pro for unlimited access.`);
+    throw new ApiError(
+      403,
+      `You've used your ${result?.usage_limit ?? 10} free ${label} — everything you already made is safe and stays yours. Pro is ₱199 for 30 days, no auto-renew, and removes the limit.`,
+    );
   }
   return result;
 }

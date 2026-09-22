@@ -128,7 +128,7 @@ export default async function InterviewPrepPage() {
       <section className="px-5 pt-20 md:px-8 md:pt-28">
         <div className="mx-auto max-w-5xl">
           <h2 className="display-md">
-            What is in the bank<span className="dot">.</span>
+            The questions you&rsquo;ll practise<span className="dot">.</span>
           </h2>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {INTERVIEW_TYPES.map((t, i) => (

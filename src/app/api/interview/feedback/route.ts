@@ -187,7 +187,8 @@ export async function POST(request: Request) {
       subject: user.id,
       limit: 30,
       windowSeconds: 60 * 60,
-      message: 'Interview feedback limit reached. Try again in an hour.',
+      message:
+        'You\u2019ve graded a lot of answers this hour, so feedback cools down for an hour to keep things fair. Your typed answers are saved — pick up where you left off later.',
     });
     await enforceRateLimit({
       bucket: 'ai-interview-ip',
