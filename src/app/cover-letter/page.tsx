@@ -6,7 +6,17 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Nav from '@/components/Nav';
 import GradientBg from '@/components/GradientBg';
 import Footer from '@/components/Footer';
-import { type Niche, buildLetter, detectTools, nicheMeta, suggestNiche } from '@/lib/cover-letter-templates';
+import {
+  type LetterFormat,
+  type Niche,
+  buildLetter,
+  checkLetter,
+  detectTools,
+  nicheMeta,
+  subjectLines,
+  suggestNiche,
+  takeCount,
+} from '@/lib/cover-letter-templates';
 import NichePicker from '@/components/NichePicker';
 import { usePreferences } from '@/lib/usePreferences';
 import { useSubscription } from '@/lib/useSubscription';
@@ -115,7 +125,17 @@ function CoverLetter() {
   const [nicheTouched, setNicheTouched] = useState(false);
 
   const [generated, setGenerated] = useState<string | null>(null);
+  /**
+   * Both renderings of the last template generation. One paid use buys the
+   * full letter AND the short message; switching tabs is free and edits are
+   * kept per tab.
+   */
+  const [letters, setLetters] = useState<{ full: string; short: string } | null>(null);
+  const [activeFormat, setActiveFormat] = useState<LetterFormat>('full');
+  /** Which opener variant the current template letter uses. */
+  const [take, setTake] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [copiedSubject, setCopiedSubject] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /** Renders a link next to the error, because "upgrade" needs somewhere to go. */
@@ -308,22 +328,51 @@ function CoverLetter() {
     }
   };
 
-  const writeTemplate = () => {
-    const base = buildLetter(niche, {
-      name,
-      years,
-      headline,
-      role: detected.role,
-      company: detected.company,
-      contact: detected.contact,
-      listing,
-    });
+  const letterInput = () => ({
+    name,
+    years,
+    headline,
+    role: detected.role,
+    company: detected.company,
+    contact: detected.contact,
+    listing,
+  });
+
+  const writeTemplate = (nextTake = 0) => {
+    const input = letterInput();
     // Saved rules are folded in here rather than inside the templates, so all
     // seventeen stay pure functions of the listing.
-    setGenerated(applyRulesToTemplate(base, rules, name));
+    const full = applyRulesToTemplate(buildLetter(niche, input, { format: 'full', take: nextTake }), rules, name);
+    const short = applyRulesToTemplate(buildLetter(niche, input, { format: 'short', take: nextTake }), rules, name);
+    setLetters({ full, short });
+    setTake(nextTake);
+    setGenerated(activeFormat === 'short' ? short : full);
     setSource('template');
     setCopied(false);
     scrollToOutput();
+  };
+
+  /** How many distinct openers this niche can cycle through. */
+  const takesAvailable = useMemo(
+    () => takeCount(niche, { name, years, headline, role: '', company: '', contact: '', listing }),
+    [niche, name, years, headline, listing],
+  );
+
+  /**
+   * Same inputs, different opener. Costs nothing extra: the paid use bought
+   * this generation, and a fresh take is the same generation re-rendered.
+   */
+  const freshTake = () => {
+    writeTemplate((take + 1) % Math.max(takesAvailable, 1));
+  };
+
+  /** Swap between the full letter and the chat-box version, keeping edits. */
+  const switchFormat = (f: LetterFormat) => {
+    if (!letters || f === activeFormat) return;
+    setLetters((prev) => (prev ? { ...prev, [activeFormat]: generated ?? prev[activeFormat] } : prev));
+    setGenerated(letters[f]);
+    setActiveFormat(f);
+    setCopied(false);
   };
 
   const saveKey = () => {
@@ -412,6 +461,7 @@ function CoverLetter() {
       // The model is asked to include the links and the sign-off; this makes
       // sure it actually did, without stacking a second goodbye on the end.
       setGenerated(enforceRulesOnAi(letter, rules, name));
+      setLetters(null); // format tabs and fresh takes are template-only
       setSource('ai');
       setCopied(false);
       scrollToOutput();
@@ -430,6 +480,29 @@ function CoverLetter() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const copySubject = async (line: string, index: number) => {
+    await navigator.clipboard.writeText(line);
+    setCopiedSubject(index);
+    setTimeout(() => setCopiedSubject(null), 2000);
+  };
+
+  /**
+   * The letter checkup, run live against whatever is in the output box, so it
+   * keeps scoring while the user edits.
+   */
+  const checkup = useMemo(
+    () =>
+      generated
+        ? checkLetter(generated, { listing, company: detected.company, contact: detected.contact })
+        : [],
+    [generated, listing, detected.company, detected.contact],
+  );
+
+  const subjects = useMemo(
+    () => (generated ? subjectLines({ role: detected.role, company: detected.company, name }) : []),
+    [generated, detected.role, detected.company, name],
+  );
 
   const canGenerate = listing.trim().length > 0 && !busy;
 
@@ -456,7 +529,8 @@ function CoverLetter() {
           </h1>
           <p className="lede mt-5 max-w-xl">
             Pick a template built for your niche, or bring your own AI key and let a model write it.
-            Either way it stays short enough that a busy founder will actually finish it.
+            One go gets you a full letter and a short version for chat boxes, fresh takes if the
+            first opener isn&rsquo;t you, and a quick checkup before you hit send.
           </p>
         </div>
       </section>
@@ -850,6 +924,54 @@ function CoverLetter() {
 
             {generated ? (
               <>
+                {source === 'template' && letters && (
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                    <div
+                      role="radiogroup"
+                      aria-label="Letter length"
+                      className="flex gap-1 rounded-full p-1"
+                      style={{ background: 'var(--color-paper-2)' }}
+                    >
+                      {(
+                        [
+                          ['full', 'Full letter'],
+                          ['short', 'Short message'],
+                        ] as const
+                      ).map(([id, label]) => (
+                        <button
+                          key={id}
+                          type="button"
+                          role="radio"
+                          aria-checked={activeFormat === id}
+                          onClick={() => switchFormat(id)}
+                          className="rounded-full px-3.5 py-1.5 text-[0.8125rem] font-semibold transition-colors"
+                          style={{
+                            background: activeFormat === id ? 'var(--color-surface)' : 'transparent',
+                            color: activeFormat === id ? 'var(--color-ink)' : 'var(--color-muted)',
+                            boxShadow: activeFormat === id ? 'var(--shadow-tile)' : 'none',
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {takesAvailable > 1 && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost !px-3.5 !py-1.5 !text-[0.8125rem]"
+                        onClick={freshTake}
+                        title="Same details, different opening — no extra letter used"
+                      >
+                        ↻ Fresh take
+                      </button>
+                    )}
+                  </div>
+                )}
+                {source === 'template' && letters && activeFormat === 'short' && (
+                  <p className="mt-2 text-[0.8125rem]" style={{ color: 'var(--color-faint)' }}>
+                    Sized for the OnlineJobs.ph message box and Upwork proposals — same letter, no extra use spent.
+                  </p>
+                )}
                 <label htmlFor="letter" className="sr-only">
                   Your cover letter
                 </label>
@@ -865,6 +987,49 @@ function CoverLetter() {
                   Edit it before you send. A letter that sounds 90% like you beats one that sounds
                   100% like a template.
                 </p>
+
+                {checkup.length > 0 && (
+                  <div className="mt-5">
+                    <p className="eyebrow" style={{ color: 'var(--color-faint)' }}>
+                      Before you send
+                    </p>
+                    <ul className="mt-2.5 space-y-1.5">
+                      {checkup.map((c) => (
+                        <li key={c.id} className="flex items-start gap-2 text-[0.8125rem]" style={{ color: c.pass ? 'var(--color-muted)' : '#8a6a3d' }}>
+                          <span aria-hidden className="mt-px flex-none font-semibold" style={{ color: c.pass ? 'var(--color-accent)' : '#c9a35c' }}>
+                            {c.pass ? '✓' : '•'}
+                          </span>
+                          <span>{c.label}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {subjects.length > 0 && (
+                  <div className="mt-5">
+                    <p className="eyebrow" style={{ color: 'var(--color-faint)' }}>
+                      Subject lines, if this goes by email
+                    </p>
+                    <div className="mt-2.5 grid gap-1.5">
+                      {subjects.map((s, idx) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => void copySubject(s, idx)}
+                          className="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-[0.875rem] transition-colors"
+                          style={{ background: 'var(--color-paper-2)', color: 'var(--color-ink-2)' }}
+                          title="Copy this subject line"
+                        >
+                          <span className="truncate">{s}</span>
+                          <span className="flex-none text-[0.75rem] font-semibold" style={{ color: 'var(--color-accent-deep)' }}>
+                            {copiedSubject === idx ? 'Copied' : 'Copy'}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div
