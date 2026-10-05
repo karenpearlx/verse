@@ -50,6 +50,39 @@ export type AnalyticsResponse = {
   visitors: VisitorRow[];
 };
 
+/* -------------------------------------------------------------- attribution */
+
+export type ConversionRow = {
+  email: string | null;
+  occurredAt: string;
+  /** Paid amount in centavos, as PayMongo reported it. */
+  amount: number | null;
+  currency: string;
+  tier: string;
+  /** Self-reported "where did you hear about us", null when unanswered. */
+  source: string | null;
+};
+export type RevenuePoint = { date: string; revenueCentavos: number; conversions: number };
+export type SourceRow = { source: string; signups: number; conversions: number };
+
+export type AttributionResponse = {
+  provisioning: Provisioning;
+  rangeDays: number;
+  /** True until the referral_source migration has been run. */
+  sourcesMissing: boolean;
+  totals: {
+    revenueCentavos: number;
+    conversions: number;
+    conversions7d: number;
+    payingNow: number | null;
+    signups: number | null;
+    answeredSource: number | null;
+  };
+  timeline: RevenuePoint[];
+  conversions: ConversionRow[];
+  sources: SourceRow[];
+};
+
 /* ------------------------------------------------------------------ scraper */
 
 export type ScraperSourceKey = 'olj' | 'remoteok' | 'wwr';

@@ -76,7 +76,7 @@ export default function ScraperSection() {
   return (
     <div className="ad-fade space-y-5">
       <SectionTitle
-        index="02 / Scraper"
+        index="03 / Scraper"
         title="Where the jobs come from"
         sub="Counts and timestamps are counted in the database itself, so they show what actually landed, not what a run claimed to do."
       />

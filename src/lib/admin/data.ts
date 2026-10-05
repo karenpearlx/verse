@@ -6,8 +6,12 @@ import { RESUME_TEMPLATES } from '@/lib/resume';
 import { COURSES } from '@/lib/courses';
 import type {
   AnalyticsResponse,
+  AttributionResponse,
   BuiltinTemplate,
   ClickRow,
+  ConversionRow,
+  RevenuePoint,
+  SourceRow,
   FeedbackLesson,
   FeedbackResponse,
   FeedbackRow,
@@ -343,6 +347,145 @@ export async function readAnalytics(db: SupabaseClient, rangeDays: number): Prom
       }),
     sessions,
     visitors,
+  };
+}
+
+/* --------------------------------------------------------------- attribution */
+
+export const HISTORY_TABLE = 'subscription_history';
+
+/** Friendly names for the fixed keys the signup form stores. */
+const REFERRAL_LABELS: Record<string, string> = {
+  facebook: 'Facebook',
+  tiktok: 'TikTok',
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  google: 'Google search',
+  friend: 'Friend or coworker',
+  other: 'Somewhere else',
+};
+
+const referralLabel = (key: string | null | undefined) =>
+  key ? (REFERRAL_LABELS[key] ?? key) : 'Not answered';
+
+/**
+ * Revenue and attribution. Conversions come from subscription_history, which
+ * the PayMongo webhook writes exactly once per paid checkout (keyed by the
+ * provider event id), so counting rows here is counting real payments.
+ * Nothing is fetched from PayMongo's API — the webhook already recorded the
+ * amount and currency as PayMongo reported them.
+ */
+export async function readAttribution(db: SupabaseClient, rangeDays: number): Promise<AttributionResponse> {
+  const since = isoDaysAgo(rangeDays);
+
+  const history = await db
+    .from(HISTORY_TABLE)
+    .select('user_id,amount,currency,to_tier,created_at')
+    .eq('event_type', 'checkout_session.payment.paid')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(2_000);
+
+  if (history.error && !isMissingTable(history.error)) throw history.error;
+  const historyMissing = Boolean(history.error);
+
+  type HistoryRow = { user_id: string; amount: number | null; currency: string | null; to_tier: string | null; created_at: string };
+  const payments = (history.data ?? []) as HistoryRow[];
+
+  // referral_source only exists after its migration; the section still works
+  // without it, it just says so instead of rendering zeros.
+  type AccountRow = {
+    id: string;
+    email: string | null;
+    referral_source?: string | null;
+    subscription_tier: string | null;
+    subscription_status: string | null;
+  };
+  let sourcesMissing = false;
+  let accountsError: PgError = null;
+  let users: AccountRow[] = [];
+  {
+    const first = await db
+      .from('users')
+      .select('id,email,referral_source,subscription_tier,subscription_status')
+      .limit(20_000);
+    if (first.error && isMissingColumn(first.error)) {
+      sourcesMissing = true;
+      const second = await db.from('users').select('id,email,subscription_tier,subscription_status').limit(20_000);
+      accountsError = second.error;
+      users = (second.data ?? []) as unknown as AccountRow[];
+    } else {
+      accountsError = first.error;
+      users = (first.data ?? []) as unknown as AccountRow[];
+    }
+  }
+  if (accountsError && !isMissingTable(accountsError)) throw accountsError;
+  const byId = new Map(users.map((u) => [u.id, u]));
+
+  /* -- timeline ------------------------------------------------------ */
+
+  const buckets = new Map(emptyDays(rangeDays).map((day) => [day, { revenueCentavos: 0, conversions: 0 }]));
+  for (const row of payments) {
+    const bucket = buckets.get(dayKey(row.created_at));
+    if (!bucket) continue;
+    bucket.conversions += 1;
+    bucket.revenueCentavos += row.amount ?? 0;
+  }
+  const timeline: RevenuePoint[] = [...buckets.entries()].map(([date, bucket]) => ({ date, ...bucket }));
+
+  /* -- conversions list ---------------------------------------------- */
+
+  const conversions: ConversionRow[] = payments.slice(0, 50).map((row) => {
+    const user = byId.get(row.user_id);
+    return {
+      email: user?.email ?? null,
+      occurredAt: row.created_at,
+      amount: row.amount,
+      currency: row.currency ?? 'PHP',
+      tier: row.to_tier ?? 'pro',
+      source: sourcesMissing ? null : referralLabel(user?.referral_source),
+    };
+  });
+
+  /* -- signups and conversions by source ------------------------------ */
+
+  const convertedUserIds = new Set(payments.map((row) => row.user_id));
+  const bySource = new Map<string, { signups: number; conversions: number }>();
+  if (!sourcesMissing) {
+    for (const user of users) {
+      const key = referralLabel(user.referral_source);
+      const entry = bySource.get(key) ?? { signups: 0, conversions: 0 };
+      entry.signups += 1;
+      if (convertedUserIds.has(user.id)) entry.conversions += 1;
+      bySource.set(key, entry);
+    }
+  }
+  const sources: SourceRow[] = [...bySource.entries()]
+    .map(([source, entry]) => ({ source, ...entry }))
+    .sort((a, b) => b.signups - a.signups);
+
+  const since7 = isoDaysAgo(7);
+  return {
+    provisioning: historyMissing
+      ? { present: [], missing: [HISTORY_TABLE] }
+      : { present: [HISTORY_TABLE], missing: [] },
+    rangeDays,
+    sourcesMissing,
+    totals: {
+      revenueCentavos: payments.reduce((sum, row) => sum + (row.amount ?? 0), 0),
+      conversions: payments.length,
+      conversions7d: payments.filter((row) => row.created_at >= since7).length,
+      payingNow: accountsError
+        ? null
+        : users.filter(
+            (u) => (u.subscription_tier === 'pro' || u.subscription_tier === 'creator') && u.subscription_status === 'active',
+          ).length,
+      signups: accountsError ? null : users.length,
+      answeredSource: sourcesMissing || accountsError ? null : users.filter((u) => u.referral_source).length,
+    },
+    timeline,
+    conversions,
+    sources,
   };
 }
 

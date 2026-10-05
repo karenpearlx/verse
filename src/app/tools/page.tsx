@@ -8,7 +8,7 @@ import GradientBg from "@/components/GradientBg";
 export const metadata: Metadata = {
   title: "Tools",
   description:
-    "The Verse toolkit: rate check, interview prep, resume builder, cover letter builder and the follow-up writer. Free plan plus Pro.",
+    "The Verse toolkit: rate check, interview prep, resume builder, cover letter builder, the follow-up writer and the application tracker. Free plan plus Pro.",
 };
 
 /**
@@ -138,6 +138,23 @@ const TOOLS: Tool[] = [
       </Icon>
     ),
   },
+  {
+    href: "/tracker",
+    kicker: "06",
+    label: "Application tracker",
+    blurb:
+      "Every application on one board — applied, interviewing, offer — with follow-up dates attached, so nothing goes quiet just because you forgot which tab it was in.",
+    outcome: "Nothing slips through the cracks",
+    tint: "var(--color-clay-wash)",
+    ink: "var(--color-clay-deep)",
+    icon: (
+      <Icon>
+        <rect x="4.4" y="4.6" width="15.2" height="15.8" rx="2.4" {...S} />
+        <path d="M8.6 3.2h6.8v2.9H8.6z" {...S} />
+        <path d="m8.7 12.6 2.1 2.1 4.5-4.5" {...S} />
+      </Icon>
+    ),
+  },
 ];
 
 export default function ToolsPage() {
@@ -150,7 +167,7 @@ export default function ToolsPage() {
         <div className="mx-auto max-w-5xl">
           <p className="eyebrow">Toolkit</p>
           <h1 className="display-lg mt-4 max-w-3xl">
-            Five things, for the messy middle of an application<span className="dot">.</span>
+            Six things, for the messy middle of an application<span className="dot">.</span>
           </h1>
           <p className="lede mt-5 max-w-xl">
             The job board finds the work. These are for everything between finding it and

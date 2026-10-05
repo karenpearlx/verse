@@ -7,6 +7,32 @@ import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup";
 
+/**
+ * Self-reported attribution, asked once at signup. Values are fixed keys so
+ * the admin console can count them without parsing free text.
+ */
+const SOURCES = [
+  ["facebook", "Facebook"],
+  ["tiktok", "TikTok"],
+  ["instagram", "Instagram"],
+  ["youtube", "YouTube"],
+  ["google", "Google search"],
+  ["friend", "A friend or coworker"],
+  ["other", "Somewhere else"],
+] as const;
+
+/**
+ * The Google flow leaves this page before signUp() can attach metadata, so the
+ * answer rides along in a short-lived cookie that /auth/callback picks up.
+ */
+function rememberSource(value: string) {
+  try {
+    document.cookie = `vrs-src=${encodeURIComponent(value)}; path=/; max-age=1800; samesite=lax`;
+  } catch {
+    /* cookie blocked; email signups still carry it in metadata */
+  }
+}
+
 function GoogleMark() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden>
@@ -46,6 +72,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [source, setSource] = useState("");
   const [busy, setBusy] = useState<null | "email" | "google">(null);
   const [error, setError] = useState<string | null>(
     callbackError && /invalid flow state/i.test(callbackError)
@@ -93,7 +120,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           email,
           password,
           options: {
-            data: { full_name: fullName.trim() || null },
+            data: { full_name: fullName.trim() || null, referral_source: source || null },
             emailRedirectTo: `${location.origin}/auth/callback`,
           },
         });
@@ -185,6 +212,31 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           value={password}
           onChange={setPassword}
         />
+
+        {isSignup && (
+          <div>
+            <label htmlFor="source" className="mb-2 block text-sm font-medium" style={{ color: "var(--color-ink-2)" }}>
+              Where did you hear about us? <span style={{ color: "var(--color-faint)" }}>(optional)</span>
+            </label>
+            <select
+              id="source"
+              name="source"
+              className="field"
+              value={source}
+              onChange={(e) => {
+                setSource(e.target.value);
+                if (e.target.value) rememberSource(e.target.value);
+              }}
+            >
+              <option value="">Pick one if you like</option>
+              {SOURCES.map(([id, label]) => (
+                <option key={id} value={id}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {!isSignup && (
           <div className="flex items-center justify-between pt-1">

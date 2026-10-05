@@ -8,7 +8,6 @@ export type SubscriptionAccount = {
   subscription_status: SubscriptionStatus;
   subscription_ends_at: string | null;
   paymongo_customer_id: string | null;
-  paymongo_subscription_id: string | null;
   cover_letter_uses: number;
   resume_uses: number;
 };
@@ -23,7 +22,6 @@ export const DEFAULT_SUBSCRIPTION: SubscriptionAccount = {
   subscription_status: null,
   subscription_ends_at: null,
   paymongo_customer_id: null,
-  paymongo_subscription_id: null,
   cover_letter_uses: 0,
   resume_uses: 0,
 };
@@ -36,7 +34,7 @@ export function hasPaidAccess(account: Pick<SubscriptionAccount, 'subscription_t
 export async function readSubscription(supabase: SupabaseClient, userId: string): Promise<SubscriptionAccount> {
   const { data, error } = await supabase
     .from('users')
-    .select('subscription_tier,subscription_status,subscription_ends_at,paymongo_customer_id,paymongo_subscription_id,cover_letter_uses,resume_uses')
+    .select('subscription_tier,subscription_status,subscription_ends_at,paymongo_customer_id,cover_letter_uses,resume_uses')
     .eq('id', userId)
     .maybeSingle();
 

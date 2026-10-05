@@ -22,6 +22,8 @@ type Data = {
   phone: string;
   summary: string;
   skills: string;
+  /** Optional headshot as a small data URL; empty string means none. */
+  photo: string;
   jobs: Job[];
 };
 
@@ -30,7 +32,29 @@ type TemplateId = ResumeBuilderTemplateId;
 
 const STORE = 'ally-resume';
 
+/**
+ * The builder opens empty: what each field wants lives in its placeholder, so
+ * nobody has to delete somebody else's sample resume before typing their own.
+ */
 const DEFAULTS: Data = {
+  name: '',
+  title: '',
+  location: '',
+  email: '',
+  phone: '',
+  summary: '',
+  skills: '',
+  photo: '',
+  jobs: [{ id: 'j1', role: '', company: '', period: '', bullets: '' }],
+};
+
+/**
+ * An earlier version shipped pre-filled with a sample resume ("Maria Santos"),
+ * which localStorage then faithfully preserved forever. Any stored value that
+ * still exactly matches that sample is the sample, not the user, so it gets
+ * dropped on load.
+ */
+const OLD_SAMPLE: Record<string, string> = {
   name: 'Maria Santos',
   title: 'Virtual Assistant / Executive Assistant',
   location: 'Cebu, Philippines · Works US hours',
@@ -40,30 +64,24 @@ const DEFAULTS: Data = {
     'Operations and executive support for small remote teams. I build the systems that keep a founder out of the weeds — inbox, calendar, reporting, and the people doing the work.',
   skills:
     'Executive support, Inbox & calendar, SEO, Content ops, Notion, Asana, Social media, Reporting',
-  jobs: [
-    {
-      id: 'j1',
-      role: 'Executive Assistant',
-      company: 'Remote marketing agency (US)',
-      period: '2025 — present',
-      bullets:
-        'Ran inbox, calendar and travel for two founders across three time zones.\nBuilt the client-reporting workflow in Notion, cutting report day from 4 hours to 1.\nOnboarded and coordinated two junior VAs.',
-    },
-    {
-      id: 'j2',
-      role: 'General Virtual Assistant',
-      company: 'E-commerce client (AU)',
-      period: '2023 — 2025',
-      bullets:
-        'Handled customer email and chat, keeping first reply under 2 hours.\nMaintained product listings and weekly sales reports.\nDocumented every recurring task into an SOP library the next hire could run from.',
-    },
-  ],
 };
+const OLD_SAMPLE_COMPANIES = new Set(['Remote marketing agency (US)', 'E-commerce client (AU)']);
 
-/** True when a field is empty or still holding the sample value. */
-function isPlaceholder(value: string, sample: string) {
-  const clean = value.trim();
-  return !clean || clean === sample;
+function scrubOldSample(data: Data): Data {
+  const clean = { ...data };
+  for (const key of Object.keys(OLD_SAMPLE) as (keyof typeof OLD_SAMPLE & keyof Data)[]) {
+    if (typeof clean[key] === 'string' && clean[key] === OLD_SAMPLE[key]) {
+      (clean as Record<string, unknown>)[key] = '';
+    }
+  }
+  const jobs = clean.jobs.filter((j) => !OLD_SAMPLE_COMPANIES.has(j.company));
+  clean.jobs = jobs.length ? jobs : [{ id: 'j1', role: '', company: '', period: '', bullets: '' }];
+  return clean;
+}
+
+/** True when a field is empty, so an account detail can safely fill it. */
+function isPlaceholder(value: string) {
+  return !value.trim();
 }
 
 export default function Resume() {
@@ -79,7 +97,7 @@ export default function Resume() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORE);
-      if (raw) setD({ ...DEFAULTS, ...JSON.parse(raw) });
+      if (raw) setD(scrubOldSample({ ...DEFAULTS, ...JSON.parse(raw) }));
     } catch {
       /* keep defaults */
     }
@@ -116,8 +134,8 @@ export default function Resume() {
 
       setD((prev) => ({
         ...prev,
-        name: isPlaceholder(prev.name, DEFAULTS.name) ? fullName : prev.name,
-        email: isPlaceholder(prev.email, DEFAULTS.email) ? (user.email ?? prev.email) : prev.email,
+        name: isPlaceholder(prev.name) ? fullName : prev.name,
+        email: isPlaceholder(prev.email) ? (user.email ?? prev.email) : prev.email,
       }));
       setPrefilled(true);
     })();
@@ -252,28 +270,42 @@ export default function Resume() {
           <div className="card p-6 md:p-8">
             <h2 className="font-display text-xl font-extrabold tracking-tight">Your details</h2>
             <p className="mt-2 text-sm" style={{ color: 'var(--color-muted)' }}>
-              If you see sample details here, they&rsquo;re just to show how each field looks — replace
-              them with your own. Everything saves automatically as you type.
+              Everything saves automatically in this browser as you type — fill it once and it&rsquo;s
+              still here next visit.
             </p>
 
+            <PhotoField photo={d.photo} onChange={(v) => set('photo', v)} />
+
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <Input label="Full name" v={d.name} on={(v) => set('name', v)} />
-              <Input label="Headline" v={d.title} on={(v) => set('title', v)} />
+              <Input label="Full name" v={d.name} on={(v) => set('name', v)} ph="Maria Santos" />
+              <Input label="Headline" v={d.title} on={(v) => set('title', v)} ph="Virtual Assistant / Executive Assistant" />
               <div className="sm:col-span-2">
-                <Input label="Location / availability" v={d.location} on={(v) => set('location', v)} />
+                <Input label="Location / availability" v={d.location} on={(v) => set('location', v)} ph="Cebu, Philippines · Works US hours" />
               </div>
-              <Input label="Email" v={d.email} on={(v) => set('email', v)} />
-              <Input label="Phone" v={d.phone} on={(v) => set('phone', v)} />
+              <Input label="Email" v={d.email} on={(v) => set('email', v)} ph="you@example.com" />
+              <Input label="Phone" v={d.phone} on={(v) => set('phone', v)} ph="+63 9xx xxx xxxx" />
             </div>
 
             <div className="mt-4">
               <Label>Summary</Label>
-              <textarea className="field" rows={3} value={d.summary} onChange={(e) => set('summary', e.target.value)} />
+              <textarea
+                className="field"
+                rows={3}
+                value={d.summary}
+                onChange={(e) => set('summary', e.target.value)}
+                placeholder="Two or three lines on what you do and who you do it for."
+              />
             </div>
 
             <div className="mt-4">
               <Label>Skills (comma separated)</Label>
-              <textarea className="field" rows={2} value={d.skills} onChange={(e) => set('skills', e.target.value)} />
+              <textarea
+                className="field"
+                rows={2}
+                value={d.skills}
+                onChange={(e) => set('skills', e.target.value)}
+                placeholder="Executive support, Inbox & calendar, Notion, Reporting"
+              />
             </div>
 
             <h3 className="font-display mt-8 text-lg font-extrabold tracking-tight">Experience</h3>
@@ -294,10 +326,10 @@ export default function Resume() {
                     </button>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <Input label="Job title" v={j.role} on={(v) => setJob(j.id, { role: v })} />
-                    <Input label="Company" v={j.company} on={(v) => setJob(j.id, { company: v })} />
+                    <Input label="Job title" v={j.role} on={(v) => setJob(j.id, { role: v })} ph="Executive Assistant" />
+                    <Input label="Company" v={j.company} on={(v) => setJob(j.id, { company: v })} ph="Remote marketing agency (US)" />
                     <div className="sm:col-span-2">
-                      <Input label="Period" v={j.period} on={(v) => setJob(j.id, { period: v })} />
+                      <Input label="Period" v={j.period} on={(v) => setJob(j.id, { period: v })} ph="2023 — present" />
                     </div>
                   </div>
                   <div className="mt-3">
@@ -307,6 +339,7 @@ export default function Resume() {
                       rows={3}
                       value={j.bullets}
                       onChange={(e) => setJob(j.id, { bullets: e.target.value })}
+                      placeholder={'One line per win — what you did and what it changed.\nRan inbox and calendar for two founders across three time zones.'}
                     />
                   </div>
                 </div>
@@ -397,18 +430,150 @@ function Label({ children }: { children: React.ReactNode }) {
   return <span className="mb-1.5 block text-sm font-medium">{children}</span>;
 }
 
-function Input({ label, v, on }: { label: string; v: string; on: (v: string) => void }) {
+function Input({ label, v, on, ph }: { label: string; v: string; on: (v: string) => void; ph?: string }) {
   return (
     <label className="block">
       <Label>{label}</Label>
-      <input className="field" value={v} onChange={(e) => on(e.target.value)} />
+      <input className="field" value={v} onChange={(e) => on(e.target.value)} placeholder={ph} />
     </label>
+  );
+}
+
+/**
+ * Optional headshot. Photos on resumes are the norm for PH VA applications,
+ * so this is a first-class field — but it stays in this browser only.
+ *
+ * The file is centre-cropped to a small square JPEG before it is stored:
+ * localStorage holds ~5MB total and a phone photo is bigger than that on its
+ * own, so the original never goes anywhere near storage.
+ */
+const PHOTO_SIZE = 240;
+
+async function shrinkPhoto(file: File): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error('That file could not be read as an image.'));
+      el.src = url;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = PHOTO_SIZE;
+    canvas.height = PHOTO_SIZE;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('This browser blocked image processing.');
+    const side = Math.min(img.naturalWidth, img.naturalHeight);
+    ctx.drawImage(
+      img,
+      (img.naturalWidth - side) / 2,
+      (img.naturalHeight - side) / 2,
+      side,
+      side,
+      0,
+      0,
+      PHOTO_SIZE,
+      PHOTO_SIZE,
+    );
+    return canvas.toDataURL('image/jpeg', 0.85);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function PhotoField({ photo, onChange }: { photo: string; onChange: (v: string) => void }) {
+  const [error, setError] = useState<string | null>(null);
+
+  const pick = async (file: File | undefined) => {
+    if (!file) return;
+    setError(null);
+    try {
+      onChange(await shrinkPhoto(file));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not read that photo.');
+    }
+  };
+
+  return (
+    <div className="mt-5">
+      <Label>Photo (optional)</Label>
+      <div className="flex items-center gap-4">
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- a local data URL, not a remote asset
+          <img
+            src={photo}
+            alt="Your resume photo"
+            className="h-14 w-14 flex-none rounded-full object-cover"
+            style={{ border: '1px solid var(--color-line-2)' }}
+          />
+        ) : (
+          <span
+            aria-hidden
+            className="grid h-14 w-14 flex-none place-items-center rounded-full"
+            style={{ background: 'var(--color-paper-2)', border: '1px dashed var(--color-line-2)' }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="12" cy="8.4" r="3.6" stroke="var(--color-faint)" strokeWidth="1.6" />
+              <path d="M4.9 20.2a7.3 7.3 0 0 1 14.2 0" stroke="var(--color-faint)" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </span>
+        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="btn btn-ghost !px-4 !py-2 !text-sm cursor-pointer">
+            {photo ? 'Change photo' : 'Add photo'}
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => {
+                void pick(e.target.files?.[0]);
+                e.target.value = '';
+              }}
+            />
+          </label>
+          {photo ? (
+            <button
+              type="button"
+              className="tap text-sm underline underline-offset-2"
+              style={{ color: 'var(--color-muted)' }}
+              onClick={() => onChange('')}
+            >
+              Remove
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--color-faint)' }}>
+        Common on PH VA resumes, skip it for US/EU clients if you prefer. Stays in this browser only.
+      </p>
+      {error ? (
+        <p role="alert" className="mt-2 text-sm" style={{ color: '#a3384f' }}>
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function Photo({ src, ring }: { src: string; ring?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- a local data URL, not a remote asset
+    <img
+      src={src}
+      alt=""
+      className="h-16 w-16 flex-none rounded-full object-cover"
+      style={ring ? { border: '2px solid rgba(255,255,255,.75)' } : { border: '1px solid var(--color-line-2)' }}
+    />
   );
 }
 
 function Sheet({ tpl, d }: { tpl: TemplateId; d: Data }) {
   const skills = d.skills.split(',').map((s) => s.trim()).filter(Boolean);
   const classic = tpl === 'classic';
+  const name = d.name.trim() || 'Your name';
+  const hasExperience = d.jobs.some(
+    (j) => j.role.trim() || j.company.trim() || j.period.trim() || j.bullets.trim(),
+  );
 
   return (
     <div
@@ -417,31 +582,60 @@ function Sheet({ tpl, d }: { tpl: TemplateId; d: Data }) {
     >
       {/* header */}
       {tpl === 'bold' ? (
-        <div className="-mx-7 -mt-7 mb-6 px-7 py-6 md:-mx-9 md:-mt-9 md:px-9" style={{ background: 'var(--color-accent)' }}>
-          <h2 className="font-display wrap-anywhere text-2xl font-extrabold tracking-tight text-white">{d.name}</h2>
-          <p className="wrap-anywhere mt-1 text-sm" style={{ color: 'rgba(255,255,255,.85)' }}>
-            {d.title}
-          </p>
+        <div
+          className="-mx-7 -mt-7 mb-6 flex items-center gap-4 px-7 py-6 md:-mx-9 md:-mt-9 md:px-9"
+          style={{ background: 'var(--color-accent)' }}
+        >
+          {d.photo && <Photo src={d.photo} ring />}
+          <div className="min-w-0">
+            <h2 className="font-display wrap-anywhere text-2xl font-extrabold tracking-tight text-white">{name}</h2>
+            {d.title.trim() && (
+              <p className="wrap-anywhere mt-1 text-sm" style={{ color: 'rgba(255,255,255,.85)' }}>
+                {d.title}
+              </p>
+            )}
+          </div>
+        </div>
+      ) : classic ? (
+        <div className="text-center">
+          {d.photo && (
+            <div className="mb-3 flex justify-center">
+              <Photo src={d.photo} />
+            </div>
+          )}
+          <h2 className="font-display wrap-anywhere text-2xl font-extrabold tracking-tight">{name}</h2>
+          {d.title.trim() && (
+            <p className="wrap-anywhere mt-1 text-sm" style={{ color: 'var(--color-muted)' }}>
+              {d.title}
+            </p>
+          )}
+          <div className="mt-3 h-px w-full" style={{ background: 'var(--color-line-2)' }} />
         </div>
       ) : (
-        <div className={classic ? 'text-center' : ''}>
-          <h2 className="font-display wrap-anywhere text-2xl font-extrabold tracking-tight">{d.name}</h2>
-          <p className="wrap-anywhere mt-1 text-sm" style={{ color: 'var(--color-muted)' }}>
-            {d.title}
-          </p>
-          <div
-            className="mt-3 h-px w-full"
-            style={{ background: tpl === 'clean' ? 'var(--color-accent)' : 'var(--color-line-2)' }}
-          />
+        <div>
+          <div className="flex items-center gap-4">
+            {d.photo && <Photo src={d.photo} />}
+            <div className="min-w-0">
+              <h2 className="font-display wrap-anywhere text-2xl font-extrabold tracking-tight">{name}</h2>
+              {d.title.trim() && (
+                <p className="wrap-anywhere mt-1 text-sm" style={{ color: 'var(--color-muted)' }}>
+                  {d.title}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 h-px w-full" style={{ background: 'var(--color-accent)' }} />
         </div>
       )}
 
-      <p
-        className={`wrap-anywhere mt-3 text-[0.6875rem] ${classic ? 'text-center' : ''}`}
-        style={{ color: 'var(--color-muted)' }}
-      >
-        {[d.location, d.email, d.phone].filter(Boolean).join(' · ')}
-      </p>
+      {[d.location, d.email, d.phone].some((v) => v.trim()) && (
+        <p
+          className={`wrap-anywhere mt-3 text-[0.6875rem] ${classic ? 'text-center' : ''}`}
+          style={{ color: 'var(--color-muted)' }}
+        >
+          {[d.location, d.email, d.phone].map((v) => v.trim()).filter(Boolean).join(' · ')}
+        </p>
+      )}
 
       {d.summary && (
         <p className="wrap-anywhere mt-5 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--color-ink-2)' }}>
@@ -469,6 +663,14 @@ function Sheet({ tpl, d }: { tpl: TemplateId; d: Data }) {
         </>
       )}
 
+      {!hasExperience && !d.summary.trim() && skills.length === 0 && (
+        <p className="mt-6 text-[0.8125rem]" style={{ color: 'var(--color-faint)' }}>
+          Your resume builds itself here as you fill in the form.
+        </p>
+      )}
+
+      {hasExperience && (
+        <>
       <SectionTitle tpl={tpl}>Experience</SectionTitle>
       <div className="mt-2 space-y-4">
         {d.jobs.map((j) => (
@@ -497,6 +699,8 @@ function Sheet({ tpl, d }: { tpl: TemplateId; d: Data }) {
           </div>
         ))}
       </div>
+        </>
+      )}
     </div>
   );
 }

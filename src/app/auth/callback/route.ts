@@ -40,10 +40,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=Auth+is+not+configured", origin));
   }
 
-  const { error } = await supabase.auth.exchangeCodeForSession(
+  const { data: exchanged, error } = await supabase.auth.exchangeCodeForSession(
     code,
     flowId ? { flowId } : undefined,
   );
+
+  if (!error) {
+    await recordReferralSource(request, redirect, supabase, exchanged.user?.id);
+  }
 
   if (error) {
     // A parallel exchange may have already succeeded and set cookies on a
@@ -62,4 +66,34 @@ export async function GET(request: NextRequest) {
   }
 
   return redirect;
+}
+
+/**
+ * The signup form's "where did you hear about us" answer. Email signups carry
+ * it in auth metadata; the Google flow can't, so the form drops it in a
+ * short-lived cookie and this picks it up after the exchange.
+ *
+ * First answer wins (`referral_source is null`), and every failure is
+ * swallowed: attribution is never worth breaking a sign-in over, and the
+ * column may simply not exist until the migration has run.
+ */
+const SOURCE_KEYS = new Set(["facebook", "tiktok", "instagram", "youtube", "google", "friend", "other"]);
+
+async function recordReferralSource(
+  request: NextRequest,
+  redirect: NextResponse,
+  supabase: ReturnType<typeof createRouteHandlerClient>["supabase"],
+  userId: string | undefined,
+) {
+  const raw = request.cookies.get("vrs-src")?.value;
+  if (!raw) return;
+  redirect.cookies.set("vrs-src", "", { path: "/", maxAge: 0 });
+  if (!userId) return;
+  const source = decodeURIComponent(raw);
+  if (!SOURCE_KEYS.has(source)) return;
+  try {
+    await supabase.from("users").update({ referral_source: source }).eq("id", userId).is("referral_source", null);
+  } catch {
+    /* see above */
+  }
 }

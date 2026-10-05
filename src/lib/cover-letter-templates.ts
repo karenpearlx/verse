@@ -236,9 +236,41 @@ type LetterParts = {
 
 export type LetterFormat = 'full' | 'short';
 
-function compose(parts: LetterParts, input: LetterInput, format: LetterFormat, take: number) {
+export type LetterTone = 'friendly' | 'direct' | 'confident';
+
+export const LETTER_TONES: { id: LetterTone; label: string; hint: string }[] = [
+  { id: 'friendly', label: 'Friendly', hint: 'Warm and human — the default' },
+  { id: 'direct', label: 'Straight to business', hint: 'No warm-up, just the facts' },
+  { id: 'confident', label: 'Confident', hint: 'Backs itself a little harder' },
+];
+
+/** What each tone asks of the AI writer. Kept here so both modes agree on what a tone means. */
+export const TONE_INSTRUCTIONS: Record<LetterTone, string> = {
+  friendly: 'Write in a warm, friendly, human tone — personable but still professional.',
+  direct: 'Write in a brisk, straight-to-business tone. No pleasantries or warm-up sentences; lead with facts and keep every sentence earning its place.',
+  confident: 'Write in a confident, self-assured tone that backs itself without arrogance or buzzwords.',
+};
+
+/**
+ * Tone is a transform over the niche's parts, not a third copy of every
+ * letter: direct drops the scene-setting paragraph and shortens the sign-off,
+ * confident adds one self-assured beat and a warmer close.
+ */
+function withTone(parts: LetterParts, tone: LetterTone): LetterParts {
+  if (tone === 'direct') {
+    return { ...parts, context: '', bulletsHeader: 'The short version', signLine: 'Thanks,' };
+  }
+  if (tone === 'confident') {
+    return { ...parts, signLine: 'Talk soon,' };
+  }
+  return parts;
+}
+
+function compose(rawParts: LetterParts, input: LetterInput, format: LetterFormat, take: number, tone: LetterTone) {
+  const parts = withTone(rawParts, tone);
   const opener = input.headline.trim() || parts.openers[take % parts.openers.length];
-  const head = `${greeting(input.contact)}\n\n${parts.intro} ${opener}`;
+  const confidentBeat = tone === 'confident' ? " I'll keep this short — the work speaks better than the letter." : '';
+  const head = `${greeting(input.contact)}\n\n${parts.intro} ${opener}${confidentBeat}`;
   const sign = signoff(input.name, parts.signLine);
 
   if (format === 'short') {
@@ -251,7 +283,9 @@ function compose(parts: LetterParts, input: LetterInput, format: LetterFormat, t
   }
 
   const bulletBlock = parts.bullets.map((b) => `- ${b}`).join('\n');
-  return `${head}\n\n${parts.context}\n\n${parts.bulletsHeader}:\n\n${bulletBlock}\n\n${parts.closer}\n\n${sign}`
+  return [head, parts.context.trim(), `${parts.bulletsHeader}:\n\n${bulletBlock}`, parts.closer, sign]
+    .filter(Boolean)
+    .join('\n\n')
     .replace(/[ \t]+\n/g, '\n')
     .trim();
 }
@@ -741,9 +775,9 @@ const BUILDERS: Record<Niche, PartsBuilder> = {
 export function buildLetter(
   niche: Niche,
   input: LetterInput,
-  opts?: { format?: LetterFormat; take?: number },
+  opts?: { format?: LetterFormat; take?: number; tone?: LetterTone },
 ) {
-  return compose(BUILDERS[niche](input), input, opts?.format ?? 'full', opts?.take ?? 0);
+  return compose(BUILDERS[niche](input), input, opts?.format ?? 'full', opts?.take ?? 0, opts?.tone ?? 'friendly');
 }
 
 /** How many distinct openers a niche can cycle through with "Fresh take". */

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
   FREE_COVER_LETTER_LIMIT,
@@ -15,11 +14,12 @@ import { startCheckout } from '@/lib/useSubscription';
  * "Current plan", above the preferences form.
  *
  * The account is read on the server and passed in, so this never renders a
- * plan the session does not actually have. The only things it does on its own
- * are start checkout and cancel.
+ * plan the session does not actually have. The only thing it does on its own
+ * is start checkout.
  *
  * Wording matters here: Hosted Checkout access is prepaid for a fixed window
- * and does not auto-renew, so this must never say "renews on".
+ * and does not auto-renew, so there is nothing to cancel and this must never
+ * say "renews on".
  */
 
 function Row({ label, value, tone }: { label: string; value: string; tone?: 'good' | 'warn' }) {
@@ -71,14 +71,11 @@ export default function PlanPanel({
   /** True right after PayMongo sends the browser back with checkout=success. */
   justPaid?: boolean;
 }) {
-  const router = useRouter();
-  const [busy, setBusy] = useState<'checkout' | 'cancel' | null>(null);
+  const [busy, setBusy] = useState<'checkout' | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [cancelNote, setCancelNote] = useState<string | null>(null);
 
   const paid = account.subscription_tier !== 'free' && account.subscription_status === 'active';
   const ends = formatPlanDate(account.subscription_ends_at);
-  const recurring = Boolean(account.paymongo_subscription_id);
 
   const upgrade = async () => {
     setBusy('checkout');
@@ -88,30 +85,6 @@ export default function PlanPanel({
       window.location.assign(url);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not open checkout.');
-      setBusy(null);
-    }
-  };
-
-  const cancel = async () => {
-    setBusy('cancel');
-    setError(null);
-    try {
-      const response = await fetch('/api/subscription/cancel', { method: 'POST' });
-      const body = (await response.json().catch(() => null)) as
-        | { cancelled?: boolean; prepaid?: boolean; access_ends_at?: string | null; error?: string }
-        | null;
-      if (!response.ok) throw new Error(body?.error?.trim() || 'Could not cancel right now.');
-
-      const until = formatPlanDate(body?.access_ends_at ?? account.subscription_ends_at);
-      setCancelNote(
-        body?.cancelled
-          ? `Cancelled. You keep Pro${until ? ` until ${until}` : ' until the end of the paid period'}.`
-          : 'Nothing to cancel: this access was a one-off payment and will simply run out.',
-      );
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not cancel right now.');
-    } finally {
       setBusy(null);
     }
   };
@@ -157,9 +130,7 @@ export default function PlanPanel({
             {paid ? (
               <div className="divide-y" style={{ borderColor: 'var(--color-line)' }}>
                 <Row label="Status" value="Active" tone="good" />
-                {ends ? (
-                  <Row label={recurring ? 'Renews on' : 'Access runs until'} value={ends} />
-                ) : null}
+                {ends ? <Row label="Access runs until" value={ends} /> : null}
                 <Row label="Cover letters" value="Unlimited" />
                 <Row label="Resume exports" value="Unlimited" />
                 <Row label="Saved jobs" value="Unlimited" />
@@ -183,12 +154,6 @@ export default function PlanPanel({
               </p>
             ) : null}
 
-            {cancelNote ? (
-              <p className="mt-5 text-[0.9375rem] leading-relaxed" style={{ color: 'var(--color-ink-2)' }}>
-                {cancelNote}
-              </p>
-            ) : null}
-
             {error ? (
               <p role="alert" className="mt-5 text-[0.9375rem] font-semibold" style={{ color: '#a3384f' }}>
                 {error}
@@ -197,21 +162,9 @@ export default function PlanPanel({
 
             <div className="mt-7 flex flex-wrap gap-3">
               {paid ? (
-                <>
-                  <Link href="/pricing" className="btn btn-ghost">
-                    What is included
-                  </Link>
-                  {recurring ? (
-                    <button
-                      type="button"
-                      onClick={() => void cancel()}
-                      disabled={busy === 'cancel'}
-                      className="btn btn-ghost"
-                    >
-                      {busy === 'cancel' ? 'Cancelling…' : 'Cancel renewal'}
-                    </button>
-                  ) : null}
-                </>
+                <Link href="/pricing" className="btn btn-ghost">
+                  What is included
+                </Link>
               ) : (
                 <>
                   <button

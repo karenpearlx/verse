@@ -7,6 +7,9 @@ import dynamic from 'next/dynamic';
 const AnalyticsSection = dynamic(() => import('./AnalyticsSection'), {
   loading: () => <SectionLoading label="Analytics" />,
 });
+const AttributionSection = dynamic(() => import('./AttributionSection'), {
+  loading: () => <SectionLoading label="Revenue" />,
+});
 const ContentSection = dynamic(() => import('./ContentSection'), {
   loading: () => <SectionLoading label="Content" />,
 });
@@ -30,10 +33,11 @@ function SectionLoading({ label }: { label: string }) {
 
 const SECTIONS = [
   { id: 'analytics', index: '01', label: 'Analytics' },
-  { id: 'scraper', index: '02', label: 'Scraper' },
-  { id: 'people', index: '03', label: 'People' },
-  { id: 'content', index: '04', label: 'Content' },
-  { id: 'settings', index: '05', label: 'Settings' },
+  { id: 'revenue', index: '02', label: 'Revenue' },
+  { id: 'scraper', index: '03', label: 'Scraper' },
+  { id: 'people', index: '04', label: 'People' },
+  { id: 'content', index: '05', label: 'Content' },
+  { id: 'settings', index: '06', label: 'Settings' },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]['id'];
@@ -146,6 +150,7 @@ export default function AdminDashboard({
         <main className="ad-main px-5 py-7 sm:px-8 sm:py-10">
           <div className="mx-auto max-w-6xl">
             {active === 'analytics' ? <AnalyticsSection /> : null}
+            {active === 'revenue' ? <AttributionSection /> : null}
             {active === 'scraper' ? <ScraperSection /> : null}
             {active === 'people' ? <UsersSection /> : null}
             {active === 'content' ? <ContentSection /> : null}

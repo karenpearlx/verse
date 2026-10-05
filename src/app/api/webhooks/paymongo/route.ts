@@ -66,57 +66,11 @@ export async function POST(request: Request) {
       return Response.json({ received: true });
     }
 
-    const subscriptionEvents = new Set([
-      'subscription.activated', 'subscription.past_due', 'subscription.unpaid',
-      'subscription.updated', 'subscription.invoice.paid', 'subscription.invoice.payment_failed',
-    ]);
-    if (!subscriptionEvents.has(event.eventType)) return Response.json({ received: true, ignored: 'type' });
-
-    const subscriptionId = event.eventType.startsWith('subscription.invoice.')
-      ? text(attrs.resource_id)
-      : resourceId;
-    const customerId = text(attrs.customer_id);
-    let lookup = db.from('users').select('id,subscription_tier');
-    if (subscriptionId) lookup = lookup.eq('paymongo_subscription_id', subscriptionId);
-    else if (customerId) lookup = lookup.eq('paymongo_customer_id', customerId);
-    else return Response.json({ received: true, ignored: 'unmatched' });
-    const { data: account, error: accountError } = await lookup.maybeSingle();
-    if (accountError) throw accountError;
-    if (!account) return Response.json({ received: true, ignored: 'unmatched' });
-
-    const status = event.eventType === 'subscription.past_due'
-      || event.eventType === 'subscription.unpaid'
-      || event.eventType === 'subscription.invoice.payment_failed'
-      ? 'past_due'
-      : text(attrs.status) === 'cancelled' ? 'cancelled' : 'active';
-    const { data: inserted, error: historyError } = await db.from('subscription_history').insert({
-      user_id: account.id,
-      provider_event_id: event.eventId,
-      event_type: event.eventType,
-      from_tier: account.subscription_tier,
-      to_tier: account.subscription_tier === 'creator' ? 'creator' : 'pro',
-      status,
-      amount: integer(attrs.amount),
-      currency: text(attrs.currency),
-      paymongo_resource_id: resourceId ?? subscriptionId,
-      metadata: attrs,
-    }).select('id').maybeSingle();
-    if (historyError?.code !== '23505') {
-      if (historyError) throw historyError;
-      if (inserted) {
-        const patch: Json = {
-          subscription_tier: account.subscription_tier === 'creator' ? 'creator' : 'pro',
-          subscription_status: status,
-        };
-        if (subscriptionId) patch.paymongo_subscription_id = subscriptionId;
-        if (customerId) patch.paymongo_customer_id = customerId;
-        const nextBilling = text(attrs.next_billing_schedule);
-        if (nextBilling) patch.subscription_ends_at = new Date(`${nextBilling}T23:59:59.999Z`).toISOString();
-        const { error } = await db.from('users').update(patch).eq('id', account.id);
-        if (error) throw error;
-      }
-    }
-    return Response.json({ received: true });
+    // Pro is a one-off prepaid purchase through Hosted Checkout, so the paid
+    // checkout session above is the only event that changes an account.
+    // Recurring subscription.* events are ignored on purpose: handling them
+    // once put "Renews on" in front of a product whose pitch is no auto-renew.
+    return Response.json({ received: true, ignored: 'type' });
   } catch (error) {
     return apiError(error);
   }

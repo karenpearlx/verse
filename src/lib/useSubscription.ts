@@ -15,7 +15,6 @@ export type SubscriptionSnapshot = {
   subscription_tier: SubscriptionTier;
   subscription_status: 'active' | 'cancelled' | 'past_due' | null;
   subscription_ends_at: string | null;
-  paymongo_subscription_id: string | null;
   cover_letter_uses: number;
   resume_uses: number;
   has_paid_access: boolean;

@@ -100,7 +100,7 @@ export default function ContentSection() {
   return (
     <div className="ad-fade space-y-5">
       <SectionTitle
-        index="04 / Content"
+        index="05 / Content"
         title="Templates and tags"
         sub="Built-in templates ship with the app and are edited in code. Anything added here is stored in the database and layered on top."
       />

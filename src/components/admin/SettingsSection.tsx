@@ -80,7 +80,7 @@ export default function SettingsSection({
   return (
     <div className="ad-fade space-y-5">
       <SectionTitle
-        index="05 / Settings"
+        index="06 / Settings"
         title="Access and privacy"
         sub="What is wired up, what is not, who is signed in, and how this browser is treated by the analytics you are looking at."
       />

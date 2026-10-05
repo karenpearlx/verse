@@ -1,5 +1,6 @@
 import { ApiError, apiError, consumeFeatureUse, jsonObject, readJson, requireActiveUser, stringField } from '@/lib/api';
 import { parseRules, rulesPromptBlock } from '@/lib/cover-letter-rules';
+import { TONE_INSTRUCTIONS, type LetterTone } from '@/lib/cover-letter-templates';
 import { clientIp, enforceRateLimit } from '@/lib/rate-limit';
 
 type Provider = 'openai' | 'anthropic';
@@ -9,6 +10,11 @@ function providerField(value: unknown): Provider {
     throw new ApiError(400, 'provider must be openai or anthropic.');
   }
   return value;
+}
+
+/** Tone is part of the trusted prompt, so it is allow-listed, never free text. */
+function toneField(value: unknown): LetterTone {
+  return value === 'direct' || value === 'confident' ? value : 'friendly';
 }
 
 function profileSummary(value: unknown) {
@@ -24,10 +30,12 @@ function promptFor(input: {
   company: string | null;
   profile: Record<string, unknown>;
   rules: string;
+  tone: LetterTone;
 }) {
   return `Write one concise, natural cover letter for a remote job application.
 
 Rules:
+- ${TONE_INSTRUCTIONS[input.tone]}
 - Use only facts present in the candidate profile. Never invent metrics, clients, tools, credentials, or experience.
 - Match the strongest real experience to the employer's requirements.
 - Sound like a capable colleague, not corporate marketing copy.
@@ -127,7 +135,7 @@ export async function POST(request: Request) {
     // characters stripped, and anything malformed dropped rather than passed
     // through to the model.
     const rules = rulesPromptBlock(parseRules(body.rules));
-    const prompt = promptFor({ listing, jobTitle, company, profile, rules });
+    const prompt = promptFor({ listing, jobTitle, company, profile, rules, tone: toneField(body.tone) });
 
     const result = provider === 'openai' ? await openAI(apiKey, prompt) : await anthropic(apiKey, prompt);
     await consumeFeatureUse(supabase, 'cover_letter');

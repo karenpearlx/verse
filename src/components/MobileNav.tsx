@@ -80,14 +80,18 @@ function makeTabs(signedIn: boolean): Tab[] {
       ),
     },
     {
-      key: "tracker",
-      href: "/tracker",
-      label: "Tracker",
+      key: "tools",
+      href: "/tools",
+      label: "Tools",
+      // The tracker and the individual tools live under this tab, so opening
+      // any of them keeps Tools lit instead of nothing.
+      also: ["/tracker", "/pricing-tool", "/cover-letter", "/resume", "/follow-up-email"],
       icon: (a) => (
         <Svg>
-          <rect x="4.4" y="4.6" width="15.2" height="15.8" rx="2.4" {...S} fill={wash(a)} />
-          <path d="M8.6 3.2h6.8v2.9H8.6z" {...S} fill={a ? "rgba(13,155,138,0.14)" : "var(--color-surface)"} />
-          <path d="m8.7 12.6 2.1 2.1 4.5-4.5" {...S} />
+          <rect x="3.8" y="3.8" width="7" height="7" rx="1.8" {...S} fill={wash(a)} />
+          <rect x="13.2" y="3.8" width="7" height="7" rx="1.8" {...S} fill={wash(a)} />
+          <rect x="3.8" y="13.2" width="7" height="7" rx="1.8" {...S} fill={wash(a)} />
+          <rect x="13.2" y="13.2" width="7" height="7" rx="1.8" {...S} fill={wash(a)} />
         </Svg>
       ),
     },
@@ -107,7 +111,7 @@ function makeTabs(signedIn: boolean): Tab[] {
       key: "profile",
       href: signedIn ? "/profile" : "/login",
       label: signedIn ? "Profile" : "Sign in",
-      also: signedIn ? ["/settings", "/resume"] : [],
+      also: signedIn ? ["/settings"] : [],
       icon: (a) => (
         <Svg>
           <circle cx="12" cy="8.4" r="3.6" {...S} fill={wash(a)} />

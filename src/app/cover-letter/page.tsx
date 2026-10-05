@@ -8,7 +8,9 @@ import GradientBg from '@/components/GradientBg';
 import Footer from '@/components/Footer';
 import {
   type LetterFormat,
+  type LetterTone,
   type Niche,
+  LETTER_TONES,
   buildLetter,
   checkLetter,
   detectTools,
@@ -116,6 +118,7 @@ function CoverLetter() {
   const [name, setName] = useState('');
   const [years, setYears] = useState('3');
   const [headline, setHeadline] = useState('');
+  const [tone, setTone] = useState<LetterTone>('friendly');
   const [roleOverride, setRoleOverride] = useState(params.get('role') ?? '');
   const [companyOverride, setCompanyOverride] = useState(params.get('company') ?? '');
   const { coverLetterTemplate, coverLetterRules: rules, hydrated: prefsReady } = usePreferences();
@@ -203,11 +206,12 @@ function CoverLetter() {
     try {
       const raw = localStorage.getItem(YOU_STORE);
       if (raw) {
-        const saved = JSON.parse(raw) as { name?: string; years?: string; headline?: string };
+        const saved = JSON.parse(raw) as { name?: string; years?: string; headline?: string; tone?: LetterTone };
         // eslint-disable-next-line react-hooks/set-state-in-effect -- reading a browser-only store on mount
         if (typeof saved.name === 'string' && saved.name) setName(saved.name);
         if (typeof saved.years === 'string' && saved.years) setYears(saved.years);
         if (typeof saved.headline === 'string' && saved.headline) setHeadline(saved.headline);
+        if (saved.tone && LETTER_TONES.some((t) => t.id === saved.tone)) setTone(saved.tone);
       }
     } catch {
       /* corrupt storage shouldn't take the page down */
@@ -217,11 +221,11 @@ function CoverLetter() {
   useEffect(() => {
     if (!youRestored.current) return;
     try {
-      localStorage.setItem(YOU_STORE, JSON.stringify({ name, years, headline }));
+      localStorage.setItem(YOU_STORE, JSON.stringify({ name, years, headline, tone }));
     } catch {
       /* storage blocked; the session still works */
     }
-  }, [name, years, headline]);
+  }, [name, years, headline, tone]);
 
   /**
    * Arriving from a job card.
@@ -338,12 +342,12 @@ function CoverLetter() {
     listing,
   });
 
-  const writeTemplate = (nextTake = 0) => {
+  const writeTemplate = (nextTake = 0, nextTone: LetterTone = tone) => {
     const input = letterInput();
     // Saved rules are folded in here rather than inside the templates, so all
     // seventeen stay pure functions of the listing.
-    const full = applyRulesToTemplate(buildLetter(niche, input, { format: 'full', take: nextTake }), rules, name);
-    const short = applyRulesToTemplate(buildLetter(niche, input, { format: 'short', take: nextTake }), rules, name);
+    const full = applyRulesToTemplate(buildLetter(niche, input, { format: 'full', take: nextTake, tone: nextTone }), rules, name);
+    const short = applyRulesToTemplate(buildLetter(niche, input, { format: 'short', take: nextTake, tone: nextTone }), rules, name);
     setLetters({ full, short });
     setTake(nextTake);
     setGenerated(activeFormat === 'short' ? short : full);
@@ -424,6 +428,8 @@ function CoverLetter() {
           company: detected.company || null,
           // Untrusted candidate data, delimited and labelled in the prompt.
           rules,
+          // Allow-listed server side; lands in the trusted part of the prompt.
+          tone,
           // Only fields the endpoint allow-lists; anything else is dropped there.
           profile: {
             full_name: name.trim() || null,
@@ -830,6 +836,29 @@ function CoverLetter() {
                 </label>
                 <input id="c" className="field" value={companyOverride} onChange={(e) => setCompanyOverride(e.target.value)} placeholder="auto-detected" />
               </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="tone" className="mb-1.5 block text-sm font-medium">
+                  Tone of voice
+                </label>
+                <select
+                  id="tone"
+                  className="field"
+                  value={tone}
+                  onChange={(e) => {
+                    const next = e.target.value as LetterTone;
+                    setTone(next);
+                    // A template letter already on screen re-renders in the new
+                    // tone for free — same generation, different voice.
+                    if (source === 'template' && letters) writeTemplate(take, next);
+                  }}
+                >
+                  {LETTER_TONES.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.label} — {t.hint}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <button
@@ -1017,11 +1046,11 @@ function CoverLetter() {
                           key={s}
                           type="button"
                           onClick={() => void copySubject(s, idx)}
-                          className="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-[0.875rem] transition-colors"
+                          className="flex min-w-0 items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-[0.875rem] transition-colors"
                           style={{ background: 'var(--color-paper-2)', color: 'var(--color-ink-2)' }}
                           title="Copy this subject line"
                         >
-                          <span className="truncate">{s}</span>
+                          <span className="min-w-0 flex-1 truncate">{s}</span>
                           <span className="flex-none text-[0.75rem] font-semibold" style={{ color: 'var(--color-accent-deep)' }}>
                             {copiedSubject === idx ? 'Copied' : 'Copy'}
                           </span>
