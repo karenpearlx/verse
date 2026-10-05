@@ -347,6 +347,21 @@ const ROLE: Record<Niche, Question[]> = {
       'What the deliverable looks like: a sheet, a summary, a recommendation',
       'How you cite sources so they can check your work',
     ]),
+    roleQ('general', 4, 'The client gives you a task with no instructions and goes offline for 12 hours. What do you do?', 'The timezone gap is daily life for a PH VA. They want motion without recklessness.', [
+      'A reasonable assumption made and written down, not a 12-hour wait',
+      'The reversible part done first, the irreversible part parked',
+      'A short note waiting when they wake up: what you did and why',
+    ]),
+    roleQ('general', 5, 'What tools do you live in every day, and which one are you fastest with?', 'A tool list is cheap. Depth in one tool is convincing.', [
+      'Named tools with what you actually do in them',
+      'One deep example: a shortcut, template, or small automation you built',
+      'Honesty about what you have not used yet',
+    ]),
+    roleQ('general', 6, 'How do you keep client information confidential?', 'They are about to hand a stranger their inbox and passwords.', [
+      'A password manager, never a spreadsheet of logins',
+      'What you refuse to keep on your own devices',
+      'What gets handed back or deleted when the contract ends',
+    ]),
   ],
   ea: [
     roleQ('ea', 1, 'Two meetings collide on my calendar. What do you do?', 'Calendar judgement is the job. They want to know you will not just ask them.', [
@@ -368,6 +383,21 @@ const ROLE: Record<Niche, Question[]> = {
       'Access, tools, and recurring meetings mapped first',
       'A pass through the calendar and inbox to find the patterns',
       'One small visible improvement by Friday',
+    ]),
+    roleQ('ea', 5, 'My flight is cancelled at 11pm my time. What happens next?', 'Travel chaos is the EA final exam.', [
+      'You rebook first and inform second, with options already ranked',
+      'Hotel, ground transport, and tomorrow\u2019s meetings adjusted in the same pass',
+      'What you set up in advance — loyalty numbers, backup routes — so this is recoverable',
+    ]),
+    roleQ('ea', 6, 'How do you manage my inbox without me worrying you missed something?', 'Inbox delegation fails on trust before it fails on skill.', [
+      'A label system plus a daily summary of what was handled',
+      'The agreed list of what gets flagged to them immediately',
+      'A weekly pass that proves nothing slipped, not a promise that nothing did',
+    ]),
+    roleQ('ea', 7, 'What goes into a meeting brief you prepare for me?', 'Executives judge prep quality in the first thirty seconds of a meeting.', [
+      'Who they are meeting, why now, and the one decision to make',
+      'The last interaction with that person, in one line',
+      'One page, scannable while walking to the call',
     ]),
   ],
   support: [
@@ -391,6 +421,21 @@ const ROLE: Record<Niche, Question[]> = {
       'How often you audit and rewrite the macro set',
       'Which situations never get a macro',
     ]),
+    roleQ('support', 5, 'A refund request is outside policy, but the customer has a point. What do you do?', 'Rigid agents cost customers; soft agents cost margin. They want to see the middle.', [
+      'The policy stated honestly, not hidden behind "unfortunately"',
+      'One alternative you can offer inside your authority',
+      'When you take it to the client with a recommendation, not just a question',
+    ]),
+    roleQ('support', 6, 'A customer reports a bug you cannot reproduce. Walk me through your reply and your next step.', 'Half of support is investigating without blaming the customer.', [
+      'Questions that narrow it down: device, steps, screenshot or recording',
+      'What you log for the developers so the report is usable',
+      'A holding message that keeps the customer informed without guessing',
+    ]),
+    roleQ('support', 7, 'Chat, email, and social are all blowing up at once. How do you split your attention?', 'Queue triage under pressure is the real daily skill.', [
+      'A priority rule: public and time-sensitive first, with a reason',
+      'Holding replies that buy time honestly',
+      'The point at which you tell the client the volume is not a one-person job',
+    ]),
   ],
   data: [
     roleQ('data', 1, 'How do you keep accuracy up on a 5,000-row job?', 'Speed claims are cheap. Verification is the answer.', [
@@ -408,6 +453,21 @@ const ROLE: Record<Niche, Question[]> = {
       'Hours saved per week',
       'How you knew the automated output was right',
     ]),
+    roleQ('data', 4, 'A client sends a messy spreadsheet and says "clean this up". Where do you start?', 'Vague briefs are the norm in data work. They want structure, not questions.', [
+      'A look pass first: what the columns mean, what "clean" should look like',
+      'A copy made before any change touches the original',
+      'The rules you applied, written where the client can see them',
+    ]),
+    roleQ('data', 5, 'How do you document your work so someone else could pick it up tomorrow?', 'Undocumented data work dies with the person who did it.', [
+      'A README tab or notes column that travels with the file',
+      'Formulas and sources named, not buried',
+      'The one-paragraph handover you could write right now',
+    ]),
+    roleQ('data', 6, 'What do you check before trusting a dataset you did not build?', 'Bad inputs make confident people wrong at scale.', [
+      'Row counts, duplicates, and empty fields before any analysis',
+      'Where the data came from and when it was last updated',
+      'A sanity check against one number you can verify independently',
+    ]),
   ],
   realestate: [
     roleQ('realestate', 1, 'Walk me through how you handle a new lead.', 'Speed to lead decides the commission.', [
@@ -424,6 +484,21 @@ const ROLE: Record<Niche, Question[]> = {
       'A checklist that would have flagged it earlier',
       'Who you contact, in what order, on what channel',
       'What you escalate to the agent and when',
+    ]),
+    roleQ('realestate', 4, 'How do you prepare a CMA for a listing appointment?', 'Agents hand this to VAs constantly; a bad comp set embarrasses them in the living room.', [
+      'Comps chosen by real similarity: beds, condition, distance, recency',
+      'Adjustments explained in plain language, not just numbers',
+      'Delivered as something the agent can present, not a raw export',
+    ]),
+    roleQ('realestate', 5, 'An agent asks you to post a listing before the agreement is signed. What do you say?', 'Compliance pressure arrives casually. They want a VA who holds the line politely.', [
+      'A clear no, with the rule named',
+      'An alternative offered: a coming-soon setup done properly',
+      'The draft prepared so it goes live the minute the signature lands',
+    ]),
+    roleQ('realestate', 6, 'What does your daily routine look like managing an agent\u2019s pipeline?', 'Consistency is the whole value. They are buying your routine.', [
+      'A morning pass: new leads, overnight messages, today\u2019s deadlines',
+      'CRM stages moved the day things happen, not on Fridays',
+      'The end-of-day summary the agent actually reads',
     ]),
   ],
   seo: [
@@ -447,6 +522,21 @@ const ROLE: Record<Niche, Question[]> = {
       'What you change on-page for it',
       'Honesty about what is still uncertain',
     ]),
+    roleQ('seo', 5, 'A client wants to rank first for a huge keyword within a month. What do you tell them?', 'Managing expectations is half the retainer.', [
+      'An honest no, with the reason stated in authority and competition terms',
+      'A nearer target offered: long-tail wins that build toward the big one',
+      'A timeline with checkpoints they can hold you to',
+    ]),
+    roleQ('seo', 6, 'How do you run a content refresh, and how do you pick what to refresh first?', 'Refreshes are the highest-leverage SEO work and the least understood.', [
+      'Pages picked by decay: rankings slipping on terms they used to hold',
+      'What actually changes: freshness, depth, intent match — not just the date',
+      'Measured before and after, with the timeframe stated',
+    ]),
+    roleQ('seo', 7, 'Walk me through your local SEO checklist for a service business.', 'Local is where most PH SEO VAs actually get hired.', [
+      'Google Business Profile first: categories, services, photos, reviews',
+      'NAP consistency across directories, checked not assumed',
+      'Review velocity and how you get clients to generate it',
+    ]),
   ],
   writer: [
     roleQ('writer', 1, 'How do you match a brand voice you have never written in?', 'Voice matching is the difference between a writer and a content mill.', [
@@ -468,6 +558,21 @@ const ROLE: Record<Niche, Question[]> = {
       'Primary sources and practitioners, not the top ten blog posts',
       'A question list sent to the client or an internal expert',
       'How you flag anything you could not verify',
+    ]),
+    roleQ('writer', 5, 'How do you produce ten pieces a week without the quality collapsing?', 'Volume clients fear the cliff where piece six starts sounding like filler.', [
+      'A pipeline: outlines batched, drafts batched, edits batched',
+      'Templates for structure, never for sentences',
+      'The signal you watch for that says quality is slipping',
+    ]),
+    roleQ('writer', 6, 'The client wants to rank on Google and sound human. How do you balance SEO and voice?', 'Most writers sacrifice one for the other. The job is both.', [
+      'Keywords planned into the outline, not sprinkled into finished prose',
+      'Headings written for the reader first, the crawler second',
+      'One example of a piece that did both, with the result',
+    ]),
+    roleQ('writer', 7, 'The brief is one sentence long. What do you do before writing?', 'Thin briefs are the normal case, not the exception.', [
+      'Three questions maximum, chosen because they change the piece',
+      'A stated assumption set if the client does not answer in time',
+      'A short outline approved before the full draft burns a day',
     ]),
   ],
   social: [
@@ -491,6 +596,21 @@ const ROLE: Record<Niche, Question[]> = {
       'What the data said versus what you assumed',
       'The change you made next',
     ]),
+    roleQ('social', 5, 'How do you adapt one piece of content across platforms without it feeling lazy?', 'Cross-posting the same file everywhere is the mark of an amateur.', [
+      'What changes per platform: hook, format, length, caption style',
+      'What stays constant so the brand is recognisable',
+      'One platform you would deliberately skip, and why',
+    ]),
+    roleQ('social', 6, 'What would you do in your first 30 days with our account?', 'They want an operator with a plan, not a poster.', [
+      'An audit week: what worked historically, by the numbers',
+      'Quick wins shipped while the strategy forms',
+      'A day-30 report they can forward to their boss',
+    ]),
+    roleQ('social', 7, 'How do you report results to a client who only asks about follower count?', 'Re-educating the client is part of the retainer.', [
+      'Followers reported, then immediately tied to a metric that pays',
+      'One story: a post that drove a sale, lead, or booking',
+      'Patience — the metric shifts over months, not in one report',
+    ]),
   ],
   email: [
     roleQ('email', 1, 'Open rates fell off a cliff. Where do you look first?', 'Deliverability knowledge is the moat in this niche.', [
@@ -507,6 +627,21 @@ const ROLE: Record<Niche, Question[]> = {
       'Testing the thing with the biggest lever, not the easiest one',
       'Sample size and how long you let it run',
       'What you do with a result that is not significant',
+    ]),
+    roleQ('email', 4, 'How do you grow a list without buying one?', 'Bought lists kill deliverability. They are checking you know that.', [
+      'A lead magnet matched to the product, not a generic PDF',
+      'Where the signup lives: site, checkout, content, partnerships',
+      'Why a smaller engaged list beats a bigger cold one, in revenue terms',
+    ]),
+    roleQ('email', 5, 'The client wants to email their list every day. Good idea?', 'They want judgement, not obedience.', [
+      'It depends on value per send, said with a straight answer anyway',
+      'The metrics that would prove it is working or burning the list',
+      'A middle path: daily for a segment that wants it',
+    ]),
+    roleQ('email', 6, 'What is on your pre-send checklist?', 'One bad send to 20,000 people is how email VAs get fired.', [
+      'Links clicked, merge tags tested, seed send to yourself first',
+      'Segment double-checked against the audience the copy assumes',
+      'Subject and preview text read together on a phone',
     ]),
   ],
   sales: [
@@ -525,6 +660,21 @@ const ROLE: Record<Niche, Question[]> = {
       'How the message changes across the sequence',
       'A clean break-up message at the end',
     ]),
+    roleQ('sales', 4, 'A prospect replies "not interested". What do you do with that?', 'Most SDRs archive it. The good ones mine it.', [
+      'A short, graceful close that leaves the door open',
+      'The reason captured in the CRM, if one was given',
+      'A re-engagement date set if the timing was the problem',
+    ]),
+    roleQ('sales', 5, 'How do you keep a CRM honest — no ghost deals, no stale stages?', 'A dirty pipeline makes every forecast a lie.', [
+      'A weekly hygiene pass with rules: no activity in X days gets flagged',
+      'Stage definitions that are events, not feelings',
+      'What you do with deals nobody will admit are dead',
+    ]),
+    roleQ('sales', 6, 'What numbers do you report weekly, and which one do you watch daily?', 'Activity theatre versus pipeline truth.', [
+      'Replies and meetings booked over emails sent',
+      'The daily number: new conversations started',
+      'Conversion between stages, so problems are located not just felt',
+    ]),
   ],
   design: [
     roleQ('design', 1, 'Walk me through one piece in your portfolio.', 'The brief and the constraints matter more than the pixels.', [
@@ -542,6 +692,21 @@ const ROLE: Record<Niche, Question[]> = {
       'Templates or components that make speed possible',
       'What you refuse to rush',
     ]),
+    roleQ('design', 4, 'A client says "make it pop". What happens next?', 'Translating vague feedback is the actual job description.', [
+      'Questions that convert feeling into variables: contrast, size, colour, spacing',
+      'Two options shown, not twenty',
+      'The brief updated so "pop" has a definition next time',
+    ]),
+    roleQ('design', 5, 'How do you keep brand consistency across dozens of assets and months of work?', 'Drift is invisible day to day and obvious in the quarterly review.', [
+      'A living brand sheet: colours, type, spacing, logo rules',
+      'Templates and components, with the discipline to use them',
+      'A periodic side-by-side of old and new work to catch drift',
+    ]),
+    roleQ('design', 6, 'What is in your file handoff when a project ends?', 'The handoff is the difference between a freelancer and a professional.', [
+      'Source files, exports in every needed size, and fonts licensed or linked',
+      'A naming system a stranger can navigate',
+      'One document that says what everything is and where it lives',
+    ]),
   ],
   video: [
     roleQ('video', 1, 'What makes a hook work in the first three seconds?', 'Retention is the only currency here.', [
@@ -558,6 +723,21 @@ const ROLE: Record<Niche, Question[]> = {
       'What you can rescue in post, honestly',
       'When you tell the client to reshoot',
       'A shot-list or guidance you give to stop it recurring',
+    ]),
+    roleQ('video', 4, 'How do you organise a project so another editor could take over mid-edit?', 'Disorganised editors hold clients hostage by accident.', [
+      'A folder structure with a naming convention, stated specifically',
+      'Proxies, assets, and fonts collected, not scattered across a desktop',
+      'A project file that opens clean on another machine',
+    ]),
+    roleQ('video', 5, 'How do you keep captions accurate and on-brand at speed?', 'Captions are watched muted by most of the audience. They are not a chore.', [
+      'Auto-transcribe first, human pass second — every time',
+      'Brand terms, names, and jargon in a saved dictionary',
+      'Styling consistent because it is templated, not re-made per video',
+    ]),
+    roleQ('video', 6, 'The client wants every trend copied the week it peaks. When do you push back?', 'Trend-chasing editors burn out accounts and themselves.', [
+      'The filter: does the trend fit the audience, or just the algorithm',
+      'Data from their own account on what trends did last time',
+      'A no that comes with an alternative, not just a no',
     ]),
   ],
   ops: [
@@ -581,6 +761,21 @@ const ROLE: Record<Niche, Question[]> = {
       'What you deliberately leave manual',
       'What happens when the automation breaks',
     ]),
+    roleQ('ops', 5, 'Two team members give you conflicting instructions. What do you do?', 'Ops VAs sit between people with different priorities every day.', [
+      'The conflict surfaced to both, in writing, without taking sides',
+      'The tie-breaker named: whoever owns the outcome decides',
+      'Work continued on the parts that are safe either way',
+    ]),
+    roleQ('ops', 6, 'How do you build a weekly report the CEO actually reads?', 'Reports nobody reads are the most common ops failure.', [
+      'Three numbers that matter, not thirty that exist',
+      'A flag section: what needs a decision this week',
+      'Short enough to read in two minutes, consistent enough to skim',
+    ]),
+    roleQ('ops', 7, 'A recurring task keeps getting missed. Walk me through your fix.', 'Blame is not a process improvement.', [
+      'The miss diagnosed: unclear owner, bad timing, or no trigger',
+      'A system fix: checklist, reminder, or ownership change — not "try harder"',
+      'A check two weeks later that proves it stuck',
+    ]),
   ],
   pm: [
     roleQ('pm', 1, 'A project is going to miss its date. When and how do you say so?', 'Everything about PM reduces to this question.', [
@@ -597,6 +792,21 @@ const ROLE: Record<Niche, Question[]> = {
       'The change written down and sized in time or money',
       'A trade offered: this in, that out',
       'Who decides, and how fast',
+    ]),
+    roleQ('pm', 4, 'You are handed a project mid-flight with no documentation. What do your first two days look like?', 'Inherited chaos is the normal starting condition.', [
+      'People first: owners, blockers, and the nearest deadline',
+      'A simple source of truth stood up fast, even if imperfect',
+      'The riskiest unknown named by day two',
+    ]),
+    roleQ('pm', 5, 'What goes into your weekly status update?', 'Status updates are where PMs earn or lose trust.', [
+      'On track or not, stated in the first line',
+      'What changed since last week, not a restated plan',
+      'Asks made explicit: who needs to do what by when',
+    ]),
+    roleQ('pm', 6, 'The team is spread across four time zones. How do you keep momentum?', 'Remote coordination is the whole game for a PH-based PM.', [
+      'Async by default: decisions in writing, meetings as the exception',
+      'Handoffs timed so work continues around the clock, not despite it',
+      'One overlap window protected for the conversations that need everyone',
     ]),
   ],
   bookkeeping: [
@@ -615,6 +825,21 @@ const ROLE: Record<Niche, Question[]> = {
       'Neutral framing that does not accuse',
       'The control you propose so it stops',
     ]),
+    roleQ('bookkeeping', 4, 'The bank balance and the books are off by a few thousand pesos. What do you do?', 'Reconciliation discipline is the whole job in one question.', [
+      'Timing differences ruled out before anything is called an error',
+      'A methodical hunt: recent entries, transpositions, duplicates',
+      'The discrepancy documented even after it is found and fixed',
+    ]),
+    roleQ('bookkeeping', 5, 'How do you keep receipts and documentation organised for tax time?', 'Shoebox clients become audit nightmares.', [
+      'Capture at the moment of expense, not a quarterly scramble',
+      'A naming and folder convention a tax preparer could navigate alone',
+      'A monthly completeness check against the bank feed',
+    ]),
+    roleQ('bookkeeping', 6, 'What would you set up in your first week with a new client\u2019s books?', 'Setup quality decides every month that follows.', [
+      'A chart of accounts sized to the business, not a 300-line template',
+      'Bank feeds connected and historical data reconciled to a known date',
+      'A list of questions batched for one call, not forty messages',
+    ]),
   ],
   web: [
     roleQ('web', 1, 'The site is slow. How do you find out why?', 'They want a method, not a plugin recommendation.', [
@@ -632,6 +857,21 @@ const ROLE: Record<Niche, Question[]> = {
       'A time-boxed spike before you quote',
       'A range with the uncertainty stated, not a confident wrong number',
     ]),
+    roleQ('web', 4, 'How do you hand a finished site back to a client who is not technical?', 'The handover decides whether they call you for every typo forever — or renew the retainer.', [
+      'A short recorded walkthrough of the three things they will actually edit',
+      'Access documented: logins, hosting, domain, in one place',
+      'The line drawn between what they edit and what they call you for',
+    ]),
+    roleQ('web', 5, 'A plugin update just broke the live layout. Walk me through the next 30 minutes.', 'Calm triage under a live-site fire is what they are buying.', [
+      'Rollback or restore first if the damage is visible to visitors',
+      'The cause isolated on staging, not debugged in production',
+      'A note to the client before they notice, not after they complain',
+    ]),
+    roleQ('web', 6, 'What goes in your monthly maintenance report?', 'Maintenance retainers die when the client cannot see the work.', [
+      'Updates applied, uptime, backups verified — proof, not promises',
+      'Anything prevented: blocked attacks, caught errors',
+      'One recommendation that shows you are thinking ahead',
+    ]),
   ],
   ecommerce: [
     roleQ('ecommerce', 1, 'How would you handle a spike of orders on a sale day?', 'Peak days are when a store VA earns their fee.', [
@@ -648,6 +888,21 @@ const ROLE: Record<Niche, Question[]> = {
       'What you approve without asking, and the ceiling on that',
       'How you keep the customer from leaving a bad review anyway',
       'The pattern you watch for in return reasons',
+    ]),
+    roleQ('ecommerce', 4, 'Inventory says five in stock, the warehouse says zero, and two orders just came in. What now?', 'Oversells are where store VAs prove their judgement.', [
+      'The listing paused before the hole gets deeper',
+      'Customers contacted with options before they ask: wait, swap, or refund',
+      'The sync failure chased to its cause, not just patched',
+    ]),
+    roleQ('ecommerce', 5, 'A supplier has gone quiet with open purchase orders. How do you handle it?', 'Supplier wrangling is invisible work until it saves the launch.', [
+      'Escalating channels on a schedule: email, then call, then alternates',
+      'The exposure sized: which orders and how much revenue are at risk',
+      'A backup supplier conversation started in parallel, not after it fails',
+    ]),
+    roleQ('ecommerce', 6, 'Which store numbers do you check every morning?', 'A daily rhythm separates an operator from a task-doer.', [
+      'Orders, fulfilment exceptions, and payment failures before anything else',
+      'Ad spend against revenue if they run traffic',
+      'The anomaly habit: anything unusual gets a second look, not a shrug',
     ]),
   ],
 };

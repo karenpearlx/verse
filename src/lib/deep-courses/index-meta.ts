@@ -217,7 +217,7 @@ export const COURSES_INDEX = {
         "Editing habits that halve your revision rounds",
         "8 short modules with a quiz and glossary",
       ],
-      duration: "4h 58m",
+      duration: "1h 15m",
     },
     {
       slug: "video-editing", kicker: "Career skill", badge: "Premium course", title: "Video Editing VA",
@@ -228,7 +228,7 @@ export const COURSES_INDEX = {
         "Organise raw footage so revisions are painless",
         "8 short modules with a quiz and glossary",
       ],
-      duration: "4h 58m",
+      duration: "1h 15m",
     },
     {
       slug: "bookkeeping-basics", kicker: "Career skill", badge: "Premium course", title: "Bookkeeping VA",
@@ -239,7 +239,7 @@ export const COURSES_INDEX = {
         "Know when to say \u201cthat\u2019s one for your accountant\u201d",
         "8 short modules with a quiz and glossary",
       ],
-      duration: "4h 58m",
+      duration: "1h 15m",
     },
   ],
 } as {

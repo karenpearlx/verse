@@ -56,6 +56,7 @@ export default function DeepCourseView({ course, paid }: { course: DeepCourse; p
                   chunk.wrappers,
                   <DeepCourseModules
                     slug={course.slug}
+                    courseTitle={course.title}
                     modules={visibleModules}
                     totalCount={totalModuleCount}
                     locked={locked}

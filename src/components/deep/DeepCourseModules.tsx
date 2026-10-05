@@ -3,11 +3,15 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DeepCourseModule } from '@/lib/deep-course-types';
+import ModuleQuickCheck, { readQuickChecks, type QuickCheckResult } from '@/components/deep/ModuleQuickCheck';
+import CourseRating from '@/components/deep/CourseRating';
 
 const WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
 type Props = {
   slug: string;
+  /** For the completion card. */
+  courseTitle: string;
   /** Only the modules this reader may see — locked bodies never reach the client. */
   modules: DeepCourseModule[];
   /** Full module count for the course, for progress and upsell copy. */
@@ -25,8 +29,13 @@ function storageKey(slug: string) {
   return `vrsfd:course-progress:${slug}`;
 }
 
+function checksKey(slug: string) {
+  return `vrsfd:course-checks:${slug}`;
+}
+
 export default function DeepCourseModules({
   slug,
+  courseTitle,
   modules,
   totalCount,
   locked,
@@ -41,10 +50,12 @@ export default function DeepCourseModules({
     [locked, modules, previewCount],
   );
   const [done, setDone] = useState<number[]>([]);
+  const [checks, setChecks] = useState<Record<number, QuickCheckResult>>({});
   const [hydrated, setHydrated] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating saved progress once per slug
     setHydrated(true);
     try {
       const raw = window.localStorage.getItem(storageKey(slug));
@@ -52,9 +63,53 @@ export default function DeepCourseModules({
         const parsed: unknown = JSON.parse(raw);
         if (Array.isArray(parsed)) setDone(parsed.filter((n): n is number => typeof n === 'number'));
       }
+      setChecks(readQuickChecks(slug));
     } catch {
       /* progress is a nicety, never a blocker */
     }
+  }, [slug]);
+
+  // "Try it now" checkboxes live inside pre-rendered HTML, so they are plain
+  // uncontrolled inputs: restored once after hydration, persisted with one
+  // delegated listener. Key per box is "moduleN:index".
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    let ticked = new Set<string>();
+    try {
+      const raw = window.localStorage.getItem(checksKey(slug));
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) ticked = new Set(parsed.filter((v): v is string => typeof v === 'string'));
+    } catch {
+      /* fine */
+    }
+
+    for (const holder of root.querySelectorAll<HTMLElement>('[data-module-n]')) {
+      const n = holder.dataset.moduleN;
+      holder.querySelectorAll<HTMLInputElement>('input[data-check]').forEach((box, i) => {
+        box.checked = ticked.has(`${n}:${i}`);
+      });
+    }
+
+    const onChange = (event: Event) => {
+      const box = event.target as HTMLInputElement | null;
+      if (!box?.matches('input[data-check]')) return;
+      const holder = box.closest<HTMLElement>('[data-module-n]');
+      if (!holder) return;
+      const boxes = Array.from(holder.querySelectorAll<HTMLInputElement>('input[data-check]'));
+      const key = `${holder.dataset.moduleN}:${boxes.indexOf(box)}`;
+      if (box.checked) ticked.add(key);
+      else ticked.delete(key);
+      try {
+        window.localStorage.setItem(checksKey(slug), JSON.stringify([...ticked]));
+      } catch {
+        /* fine */
+      }
+    };
+
+    root.addEventListener('change', onChange);
+    return () => root.removeEventListener('change', onChange);
   }, [slug]);
 
   const persist = useCallback(
@@ -195,7 +250,7 @@ export default function DeepCourseModules({
                     {m.outcome ? (
                       <span className="mt-1 block text-[0.875rem] leading-relaxed text-muted">{m.outcome}</span>
                     ) : null}
-                    {m.badges.length ? (
+                    {m.badges.length || (hydrated && checks[m.n]) ? (
                       <span className="mt-2 flex flex-wrap gap-1.5">
                         {m.badges.map((b) => (
                           <span
@@ -205,6 +260,17 @@ export default function DeepCourseModules({
                             {b}
                           </span>
                         ))}
+                        {hydrated && checks[m.n] ? (
+                          <span
+                            className={`rounded-full border border-transparent px-2 py-[0.15rem] text-[0.6875rem] font-semibold tabular-nums ${
+                              checks[m.n].score === checks[m.n].total
+                                ? 'bg-teal-wash text-teal-deep'
+                                : 'bg-paper-2 text-muted'
+                            }`}
+                          >
+                            Quick check {checks[m.n].score}/{checks[m.n].total}
+                          </span>
+                        ) : null}
                       </span>
                     ) : null}
                   </span>
@@ -228,9 +294,21 @@ export default function DeepCourseModules({
                   </span>
                 </summary>
 
-                <div className="border-t border-line px-5 py-5 sm:px-6">
+                <div className="border-t border-line px-5 py-5 sm:px-6" data-module-n={m.n}>
                   {/* Authored course body, generated at build time. Not user input. */}
                   <div className="space-y-5" dangerouslySetInnerHTML={{ __html: m.html }} />
+                  {m.quiz?.length ? (
+                    <ModuleQuickCheck
+                      slug={slug}
+                      moduleN={m.n}
+                      questions={m.quiz}
+                      done={isDone}
+                      onRecorded={() => setChecks(readQuickChecks(slug))}
+                      onPass={() => {
+                        if (!done.includes(m.n)) persist([...done, m.n]);
+                      }}
+                    />
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => toggle(m.n)}
@@ -249,6 +327,10 @@ export default function DeepCourseModules({
           );
         })}
       </ol>
+
+      {hydrated && !locked && totalCount > 0 && completed === totalCount ? (
+        <CourseRating slug={slug} courseTitle={courseTitle} />
+      ) : null}
 
       {locked ? (
         <div className="mt-5 rounded-2xl border border-teal-pale bg-teal-wash/60 p-5 sm:p-6">

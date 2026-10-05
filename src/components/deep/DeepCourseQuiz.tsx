@@ -1,13 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { DeepCourseQuestion } from '@/lib/deep-course-types';
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-export default function DeepCourseQuiz({ questions }: { slug: string; questions: DeepCourseQuestion[] }) {
+function bestKey(slug: string) {
+  return `vrsfd:final-quiz:${slug}`;
+}
+
+export default function DeepCourseQuiz({ slug, questions }: { slug: string; questions: DeepCourseQuestion[] }) {
   const [picked, setPicked] = useState<Record<number, number>>({});
   const [checked, setChecked] = useState(false);
+  const [best, setBest] = useState<number | null>(null);
 
   const answered = Object.keys(picked).length;
   const score = useMemo(
@@ -15,9 +20,32 @@ export default function DeepCourseQuiz({ questions }: { slug: string; questions:
     [picked, questions],
   );
 
+  useEffect(() => {
+    try {
+      const saved = Number(window.localStorage.getItem(bestKey(slug)) ?? NaN);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating saved score
+      if (Number.isFinite(saved)) setBest(saved);
+    } catch {
+      /* fine */
+    }
+  }, [slug]);
+
   function choose(qi: number, oi: number) {
     if (checked) return;
     setPicked((prev) => ({ ...prev, [qi]: oi }));
+  }
+
+  function check() {
+    setChecked(true);
+    const final = questions.reduce((n, q, i) => (picked[i] === q.answer ? n + 1 : n), 0);
+    if (best === null || final > best) {
+      setBest(final);
+      try {
+        window.localStorage.setItem(bestKey(slug), String(final));
+      } catch {
+        /* fine */
+      }
+    }
   }
 
   return (
@@ -29,7 +57,8 @@ export default function DeepCourseQuiz({ questions }: { slug: string; questions:
         </p>
       </div>
       <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed text-ink-2">
-        Six situations that come up in real work. Pick an answer for each, then check. Nothing is recorded.
+        Situations that come up in real work. Pick an answer for each, then check.
+        {best !== null ? ` Your best so far: ${best} of ${questions.length}.` : ' Your best score is saved in this browser.'}
       </p>
 
       <ol className="mt-8 space-y-5">
@@ -123,7 +152,7 @@ export default function DeepCourseQuiz({ questions }: { slug: string; questions:
             type="button"
             className="btn btn-primary !px-6 !py-3 !text-sm disabled:cursor-not-allowed disabled:opacity-50"
             disabled={answered === 0}
-            onClick={() => setChecked(true)}
+            onClick={check}
           >
             Check my answers
           </button>

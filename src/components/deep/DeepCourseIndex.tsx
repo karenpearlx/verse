@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { deepCourseFlags } from '@/lib/deep-courses';
 import { COURSES_INDEX, type DeepCourseCard } from '@/lib/deep-courses/index-meta';
+import CourseCardProgress from '@/components/deep/CourseCardProgress';
 
 function Tick() {
   return (
@@ -81,6 +82,8 @@ function Card({ c, paid }: { c: DeepCourseCard; paid: boolean }) {
             </li>
           ))}
         </ul>
+
+        <CourseCardProgress slug={c.slug} />
 
         {/* This row stacks above the card's stretched-link overlay, so the
             call to action must be a real link — a bare span here swallows

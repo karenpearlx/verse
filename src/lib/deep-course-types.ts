@@ -17,6 +17,8 @@ export type DeepCourseModule = {
   minutes: number | null;
   /** rendered module body, everything inside the disclosure */
   html: string;
+  /** generated per-module quick check, 1–3 questions */
+  quiz?: DeepCourseQuestion[];
 };
 
 export type DeepCourseQuestion = {

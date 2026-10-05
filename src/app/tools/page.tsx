@@ -179,13 +179,7 @@ export default function ToolsPage() {
       <section className="px-5 pt-12 pb-6 md:px-8 md:pt-16">
         <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
           {TOOLS.map((t, i) => (
-            <Reveal
-              key={t.href}
-              delay={i * 70}
-              /* The fifth card sits alone on the last row of a two-up grid, so
-                 it takes the full width rather than leaving a hole. */
-              className={i === TOOLS.length - 1 ? "md:col-span-2" : undefined}
-            >
+            <Reveal key={t.href} delay={i * 70}>
               <article className="card tool-card relative h-full p-6 md:p-7">
                 <div className="flex items-start gap-4">
                   <span
