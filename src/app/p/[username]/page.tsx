@@ -26,10 +26,11 @@ import {
 export const dynamic = 'force-dynamic';
 
 /* Fonts for the three pairs. Loaded here, not in the root layout, so the rest
- * of the site pays nothing for them. */
-const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '600', '700', '900'], variable: '--pf-display' });
-const lora = Lora({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--pf-serif' });
-const grotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'], variable: '--pf-grotesk' });
+ * of the site pays nothing for them. All three are variable fonts, so no
+ * weight list — multi-weight arrays break Vercel's Turbopack font resolver. */
+const fraunces = Fraunces({ subsets: ['latin'], display: 'swap', variable: '--pf-display' });
+const lora = Lora({ subsets: ['latin'], display: 'swap', variable: '--pf-serif' });
+const grotesk = Space_Grotesk({ subsets: ['latin'], display: 'swap', variable: '--pf-grotesk' });
 
 type PageProps = { params: Promise<{ username: string }> };
 
