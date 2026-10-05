@@ -211,12 +211,62 @@ export default function DeepCourseModules({
       </div>
       <p className="mt-2 text-xs text-muted-2">Progress is saved in this browser only. Nothing is sent anywhere.</p>
 
+      {/* Course map: every module as a block sized by its length. Tap to jump. */}
+      <div className="mt-6 rounded-2xl border border-line bg-card p-4 shadow-tile sm:p-5">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-[0.8125rem] font-semibold text-ink">The course at a glance</p>
+          <p className="text-[0.6875rem] text-muted">each block is a module, sized by length — tap to jump</p>
+        </div>
+        <div className="mt-3 flex h-9 w-full gap-1" role="list" aria-label="Module map">
+          {Array.from({ length: totalCount }, (_, i) => i + 1).map((n) => {
+            const mod = modules.find((m) => m.n === n);
+            const unlocked = Boolean(mod);
+            const finished = hydrated && done.includes(n);
+            return (
+              <button
+                key={n}
+                type="button"
+                role="listitem"
+                disabled={!unlocked}
+                title={mod ? `${String(n).padStart(2, '0')} ${mod.title}${mod.minutes ? ` · ${mod.minutes} min` : ''}` : `Module ${n} — unlocks with Pro`}
+                aria-label={mod ? `Jump to module ${n}: ${mod.title}` : `Module ${n}, locked`}
+                onClick={() => {
+                  const el = document.getElementById(`module-${slug}-${n}`);
+                  el?.setAttribute('open', '');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className="group/seg relative min-w-0 rounded-md transition-all disabled:cursor-not-allowed"
+                style={{
+                  flexGrow: mod?.minutes ?? 8,
+                  flexBasis: 0,
+                  background: finished
+                    ? 'var(--color-accent, #2a6a5c)'
+                    : unlocked
+                      ? 'var(--color-paper-3)'
+                      : 'var(--color-paper-2)',
+                  border: unlocked ? 'none' : '1px dashed var(--color-line-2)',
+                  opacity: unlocked ? 1 : 0.6,
+                }}
+              >
+                <span
+                  className="absolute inset-0 grid place-items-center text-[0.625rem] font-bold tabular-nums"
+                  style={{ color: finished ? '#fff' : 'var(--color-muted)' }}
+                >
+                  {n}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <ol className="mt-7 space-y-3">
         {visible.map((m) => {
           const isDone = hydrated && done.includes(m.n);
           return (
             <li key={m.n}>
               <details
+                id={`module-${slug}-${m.n}`}
                 className={`group overflow-hidden rounded-2xl border bg-card shadow-tile transition-colors ${
                   isDone ? 'border-teal-pale' : 'border-line'
                 }`}

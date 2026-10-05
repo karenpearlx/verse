@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import Nav from '@/components/Nav';
 import DeepCourseGlossary from '@/components/deep/DeepCourseGlossary';
 import DeepCourseModules from '@/components/deep/DeepCourseModules';
+import CourseToolbox from '@/components/deep/CourseToolbox';
 import DeepCourseQuiz from '@/components/deep/DeepCourseQuiz';
 import type { DeepCourse, DeepCourseWrapper } from '@/lib/deep-course-types';
 import { premiumDeepCourseCount } from '@/lib/deep-courses';
@@ -54,17 +55,20 @@ export default function DeepCourseView({ course, paid }: { course: DeepCourse; p
               <div key="modules">
                 {withWrappers(
                   chunk.wrappers,
-                  <DeepCourseModules
-                    slug={course.slug}
-                    courseTitle={course.title}
-                    modules={visibleModules}
-                    totalCount={totalModuleCount}
-                    locked={locked}
-                    previewCount={course.previewCount}
-                    paid={paid}
-                    priceLabel={PRICE_LABEL}
-                    premiumTrackCount={premiumTrackCount}
-                  />,
+                  <>
+                    <CourseToolbox slug={course.slug} />
+                    <DeepCourseModules
+                      slug={course.slug}
+                      courseTitle={course.title}
+                      modules={visibleModules}
+                      totalCount={totalModuleCount}
+                      locked={locked}
+                      previewCount={course.previewCount}
+                      paid={paid}
+                      priceLabel={PRICE_LABEL}
+                      premiumTrackCount={premiumTrackCount}
+                    />
+                  </>,
                 )}
               </div>
             );
