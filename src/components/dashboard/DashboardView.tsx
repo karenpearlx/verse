@@ -221,12 +221,15 @@ export default function DashboardView({
                 </p>
               )}
 
-              <div className="mt-auto pt-6">
+              <div className="mt-auto flex flex-wrap gap-2 pt-6">
                 <Link
                   href="/profile"
                   className={`btn ${missing.length ? 'btn-primary' : 'btn-ghost'} !py-2.5 !text-sm`}
                 >
                   {missing.length ? 'Finish your profile' : 'View profile'}
+                </Link>
+                <Link href="/portfolio" className="btn btn-ghost !py-2.5 !text-sm">
+                  Public portfolio
                 </Link>
               </div>
             </div>

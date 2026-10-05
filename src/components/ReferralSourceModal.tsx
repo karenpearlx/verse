@@ -30,6 +30,7 @@ const HIDDEN_PREFIXES = [
   '/forgot-password',
   '/reset-password',
   '/offline',
+  '/p',
 ];
 
 function alreadyDone(uid: string) {

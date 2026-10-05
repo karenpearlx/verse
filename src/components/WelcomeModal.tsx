@@ -31,6 +31,7 @@ const HIDDEN_PREFIXES = [
   "/forgot-password",
   "/reset-password",
   "/offline",
+  "/p",
 ];
 
 /** Shown until the live count comes back — and if it never does. */

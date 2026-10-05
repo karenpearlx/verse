@@ -24,6 +24,7 @@ const HIDDEN_PREFIXES = [
   "/forgot-password",
   "/reset-password",
   "/offline",
+  "/p",
 ];
 
 type Tab = {

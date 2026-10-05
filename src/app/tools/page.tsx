@@ -155,6 +155,24 @@ const TOOLS: Tool[] = [
       </Icon>
     ),
   },
+  {
+    href: "/portfolio",
+    kicker: "07 · NEW",
+    label: "Public portfolio",
+    blurb:
+      "One shareable page — vrsfd.com/p/you — built from your profile, finished courses and work samples. Paste one link into every application instead of a bare resume.",
+    outcome: "A link that does the convincing for you",
+    tint: "var(--color-teal-wash)",
+    ink: "var(--color-teal-deep)",
+    icon: (
+      <Icon>
+        <circle cx="9" cy="9.2" r="2.6" {...S} />
+        <path d="M4.4 18.2c.7-2.6 2.5-4 4.6-4s3.9 1.4 4.6 4" {...S} />
+        <path d="M14.8 7.4h4.8M14.8 10.8h4.8M14.8 14.2h2.4" {...S} />
+        <rect x="2" y="3.4" width="20" height="17.2" rx="2.6" {...S} />
+      </Icon>
+    ),
+  },
 ];
 
 export default function ToolsPage() {
@@ -167,7 +185,7 @@ export default function ToolsPage() {
         <div className="mx-auto max-w-5xl">
           <p className="eyebrow">Toolkit</p>
           <h1 className="display-lg mt-4 max-w-3xl">
-            Six things, for the messy middle of an application<span className="dot">.</span>
+            Seven things, for the messy middle of an application<span className="dot">.</span>
           </h1>
           <p className="lede mt-5 max-w-xl">
             The job board finds the work. These are for everything between finding it and
@@ -179,7 +197,8 @@ export default function ToolsPage() {
       <section className="px-5 pt-12 pb-6 md:px-8 md:pt-16">
         <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
           {TOOLS.map((t, i) => (
-            <Reveal key={t.href} delay={i * 70}>
+            // The new portfolio card is featured full-width on purpose.
+            <Reveal key={t.href} delay={i * 70} className={t.href === "/portfolio" ? "md:col-span-2" : undefined}>
               <article className="card tool-card relative h-full p-6 md:p-7">
                 <div className="flex items-start gap-4">
                   <span
