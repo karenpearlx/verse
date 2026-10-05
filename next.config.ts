@@ -34,6 +34,18 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@dnd-kit/core", "@dnd-kit/sortable", "@dnd-kit/utilities"],
   },
+  async redirects() {
+    return [
+      // One canonical host: www serves a valid certificate (added on Vercel)
+      // but must not become a duplicate copy of the site in search engines.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.vrsfd.com" }],
+        destination: "https://vrsfd.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
