@@ -19,7 +19,8 @@ import { REFERRAL_SOURCES, type ReferralSourceId } from '@/lib/referral-sources'
  * storage is blocked, the site keeps working and the modal simply stays away.
  */
 
-const DONE_KEY = 'vrs-src-answered';
+// Scoped per account so a second person on the same browser still gets asked.
+const doneKey = (uid: string) => `vrs-src-answered:${uid}`;
 
 const HIDDEN_PREFIXES = [
   '/admin',
@@ -31,9 +32,9 @@ const HIDDEN_PREFIXES = [
   '/offline',
 ];
 
-function alreadyDone() {
+function alreadyDone(uid: string) {
   try {
-    return localStorage.getItem(DONE_KEY) === '1';
+    return localStorage.getItem(doneKey(uid)) === '1';
   } catch {
     // Storage blocked: we could not remember an answer anyway, so skip rather
     // than ask on every page view.
@@ -41,9 +42,9 @@ function alreadyDone() {
   }
 }
 
-function markDone() {
+function markDone(uid: string) {
   try {
-    localStorage.setItem(DONE_KEY, '1');
+    localStorage.setItem(doneKey(uid), '1');
   } catch {
     /* the DB row is the real record; this is just to skip the lookup */
   }
@@ -60,7 +61,7 @@ export default function ReferralSourceModal() {
   const signedIn = ready && status === 'in' && Boolean(user);
 
   useEffect(() => {
-    if (!signedIn || !user || hidden || alreadyDone()) return;
+    if (!signedIn || !user || hidden || alreadyDone(user.id)) return;
     let alive = true;
 
     void (async () => {
@@ -73,7 +74,7 @@ export default function ReferralSourceModal() {
         if (!alive || error) return;
         const source = (data as { referral_source?: string | null } | null)?.referral_source;
         if (source) {
-          markDone();
+          markDone(user.id);
           return;
         }
         setOpen(true);
@@ -93,8 +94,14 @@ export default function ReferralSourceModal() {
     if (!picked || !user) return;
     setSaving(true);
     try {
-      await createClient().from('users').update({ referral_source: picked }).eq('id', user.id);
-      markDone();
+      // Supabase returns errors instead of throwing: only record "answered"
+      // once the row is really written, so the answer is never silently lost.
+      const { error } = await createClient()
+        .from('users')
+        .update({ referral_source: picked })
+        .eq('id', user.id);
+      if (error) return; // keep the modal up; Save comes back for another try
+      markDone(user.id);
       setOpen(false);
     } catch {
       // Keep the modal up; the button comes back and they can tap Save again.
