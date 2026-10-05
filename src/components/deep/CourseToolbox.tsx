@@ -20,7 +20,7 @@ export default function CourseToolbox({ slug }: { slug: string }) {
         <h3 className="font-display text-[1.0625rem] font-semibold text-ink">The toolbox</h3>
         <p className="mt-1 text-[0.875rem] leading-relaxed text-muted">
           Set these up before module 1 — the exercises assume them. Anything marked{' '}
-          <span className="font-semibold">paid</span> is normally the client&rsquo;s seat, not yours to buy.
+          <span className="font-semibold">paid</span>{' '}is normally the client&rsquo;s seat, not yours to buy.
         </p>
       </div>
       <div className="overflow-x-auto">
