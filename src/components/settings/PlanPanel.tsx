@@ -171,8 +171,8 @@ export default function PlanPanel({
                   <Meter label="Resume exports" used={account.resume_uses} limit={FREE_RESUME_LIMIT} />
                 </div>
                 <p className="mt-5 text-[0.9375rem] leading-relaxed" style={{ color: 'var(--color-muted)' }}>
-                  These are lifetime counts, not monthly. Pro removes them, opens every premium course, and shows
-                  you new jobs a day early for ₱{PRO_PRICE_PESOS}, which buys {PRO_ACCESS_DAYS} days.
+                  These are lifetime counts, not monthly. Pro removes them and opens every premium course for ₱
+                  {PRO_PRICE_PESOS}, which buys {PRO_ACCESS_DAYS} days.
                 </p>
               </>
             )}

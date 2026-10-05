@@ -1,4 +1,4 @@
-import { ApiError, apiError, consumeFeatureUse, jsonObject, paginationFrom, paginationMeta, readJson, requireActiveUser, requireUser, stringField } from '@/lib/api';
+import { ApiError, apiError, jsonObject, paginationFrom, paginationMeta, readJson, requireActiveUser, requireUser, stringField } from '@/lib/api';
 import { RESUME_TEMPLATES } from '@/lib/resume';
 
 function templateName(value: unknown, fallback = 'classic') {
@@ -47,7 +47,8 @@ export async function POST(request: Request) {
       template_name: templateName(body.template_name),
       content: resumeContent(body.content),
     };
-    await consumeFeatureUse(supabase, 'resume');
+    // Saving a resume is free; only the export route spends a use. Charging
+    // here too made save-then-download cost 2 of the 10 advertised exports.
     const { data, error } = await supabase.from('resumes').insert(record).select().single();
     if (error) throw error;
     return Response.json({ resume: data }, { status: 201 });

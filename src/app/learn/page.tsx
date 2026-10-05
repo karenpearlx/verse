@@ -5,11 +5,21 @@ import Reveal from "@/components/Reveal";
 import StartTrack from "@/components/StartTrack";
 import GradientBg from "@/components/GradientBg";
 
-const TRACKS = [
+const TRACKS: {
+  kicker: string;
+  title: string;
+  minutes: string;
+  lessons: string[];
+  /** Where the full material lives. Track 01 has its own lesson page. */
+  href: string;
+  cta: string;
+}[] = [
   {
     kicker: "Track 01",
     title: "Before you apply",
     minutes: "28 min",
+    href: "/learn/start",
+    cta: "Read track 01",
     lessons: [
       "What a VA actually does all day",
       "Picking a niche that pays more than general admin",
@@ -21,6 +31,8 @@ const TRACKS = [
     kicker: "Track 02",
     title: "Getting hired",
     minutes: "41 min",
+    href: "/courses/applications-that-get-replies",
+    cta: "Covered in full: Applications That Get Replies",
     lessons: [
       "A cover letter that sounds like a person",
       "Portfolio pieces when you have no clients yet",
@@ -33,6 +45,8 @@ const TRACKS = [
     kicker: "Track 03",
     title: "Getting paid properly",
     minutes: "33 min",
+    href: "/courses/pricing-and-negotiation",
+    cta: "Covered in full: Pricing & Negotiation",
     lessons: [
       "Quoting a rate out loud without flinching",
       "Hourly vs monthly retainer, and when to switch",
@@ -44,6 +58,8 @@ const TRACKS = [
     kicker: "Track 04",
     title: "Staying hired",
     minutes: "25 min",
+    href: "/courses/complete-va-starter",
+    cta: "Covered in full: The Complete VA Starter",
     lessons: [
       "Writing an update your client actually reads",
       "Saying no to scope creep",
@@ -135,19 +151,13 @@ export default function Learn() {
                   ))}
                 </ul>
 
-                {i === 0 ? (
-                  <Link
-                    href="/learn/start"
-                    className="tap mt-6 inline-flex items-center gap-2 text-[0.9375rem] font-semibold"
-                    style={{ color: "var(--color-accent)" }}
-                  >
-                    Read track 01 <span aria-hidden>→</span>
-                  </Link>
-                ) : (
-                  <p className="mt-6 text-sm" style={{ color: "var(--color-faint)" }}>
-                    Coming soon — we&rsquo;re writing this one now
-                  </p>
-                )}
+                <Link
+                  href={t.href}
+                  className="tap mt-6 inline-flex items-center gap-2 text-[0.9375rem] font-semibold"
+                  style={{ color: "var(--color-accent)" }}
+                >
+                  {t.cta} <span aria-hidden>→</span>
+                </Link>
               </article>
             </Reveal>
           ))}

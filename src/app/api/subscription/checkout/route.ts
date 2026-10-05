@@ -22,7 +22,7 @@ export async function POST(request: Request) {
           attributes: {
             line_items: [{
               name: 'Verse Pro, one month',
-              description: 'Unlimited career tools, premium courses, and early job access for 30 days.',
+              description: 'Unlimited career tools and every premium course for 30 days.',
               amount: PRO_PRICE_CENTAVOS,
               currency: 'PHP',
               quantity: 1,

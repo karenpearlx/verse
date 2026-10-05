@@ -56,7 +56,7 @@ export default async function FollowUpEmailPage() {
             <UpgradeGate
               eyebrow="Pro tool"
               title="This one is part of Pro"
-              description="The follow-up writer, unlimited cover letters and exports, every premium course, AI interview prep, and new jobs a day before everyone else."
+              description="The follow-up writer, unlimited cover letters and exports, every premium course, and AI interview prep with written feedback."
               bullets={[
                 'Timing-aware drafts, not one canned template',
                 'Copy straight into your email client',
