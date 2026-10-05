@@ -4,22 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { REFERRAL_SOURCES } from "@/lib/referral-sources";
 
 type Mode = "login" | "signup";
-
-/**
- * Self-reported attribution, asked once at signup. Values are fixed keys so
- * the admin console can count them without parsing free text.
- */
-const SOURCES = [
-  ["facebook", "Facebook"],
-  ["tiktok", "TikTok"],
-  ["instagram", "Instagram"],
-  ["youtube", "YouTube"],
-  ["google", "Google search"],
-  ["friend", "A friend or coworker"],
-  ["other", "Somewhere else"],
-] as const;
 
 /**
  * The Google flow leaves this page before signUp() can attach metadata, so the
@@ -229,9 +216,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
               }}
             >
               <option value="">Pick one if you like</option>
-              {SOURCES.map(([id, label]) => (
-                <option key={id} value={id}>
-                  {label}
+              {REFERRAL_SOURCES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
                 </option>
               ))}
             </select>

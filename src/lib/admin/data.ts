@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NICHES } from '@/lib/cover-letter-templates';
+import { referralSourceLabel } from '@/lib/referral-sources';
 import { RESUME_TEMPLATES } from '@/lib/resume';
 import { COURSES } from '@/lib/courses';
 import type {
@@ -354,19 +355,7 @@ export async function readAnalytics(db: SupabaseClient, rangeDays: number): Prom
 
 export const HISTORY_TABLE = 'subscription_history';
 
-/** Friendly names for the fixed keys the signup form stores. */
-const REFERRAL_LABELS: Record<string, string> = {
-  facebook: 'Facebook',
-  tiktok: 'TikTok',
-  instagram: 'Instagram',
-  youtube: 'YouTube',
-  google: 'Google search',
-  friend: 'Friend or coworker',
-  other: 'Somewhere else',
-};
-
-const referralLabel = (key: string | null | undefined) =>
-  key ? (REFERRAL_LABELS[key] ?? key) : 'Not answered';
+const referralLabel = referralSourceLabel;
 
 /**
  * Revenue and attribution. Conversions come from subscription_history, which

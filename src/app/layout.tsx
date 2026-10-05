@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/AuthContext";
 import PWA from "@/components/PWA";
 import MobileNav from "@/components/MobileNav";
 import WelcomeModal from "@/components/WelcomeModal";
+import ReferralSourceModal from "@/components/ReferralSourceModal";
 
 // Display: a heavy modern serif with quirky character.
 const display = Fraunces({
@@ -96,6 +97,7 @@ export default function RootLayout({
           {children}
           <MobileNav />
           <WelcomeModal />
+          <ReferralSourceModal />
           <PWA />
         </AuthProvider>
       </body>

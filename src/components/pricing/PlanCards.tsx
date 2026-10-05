@@ -44,11 +44,15 @@ function PlanAction({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Creator applications are paused until there is time to run them properly.
   if (plan.id === 'creator') {
     return (
-      <Link href="/creator" className="btn btn-ghost mt-7 w-full">
-        Apply to become a Creator
-      </Link>
+      <p
+        className="mt-7 rounded-full px-4 py-3 text-center text-sm font-semibold"
+        style={{ background: 'var(--color-paper-2)', color: 'var(--color-muted)' }}
+      >
+        Coming soon
+      </p>
     );
   }
 
@@ -175,7 +179,7 @@ function Card({
           className="font-display text-[2.75rem] font-extrabold leading-none tracking-tight"
           style={{ color: dark ? '#fff' : 'var(--color-ink)' }}
         >
-          {plan.price ?? 'Apply'}
+          {plan.price ?? 'Soon'}
         </span>
         <span className="text-sm" style={{ color: dark ? '#a9a6a1' : 'var(--color-faint)' }}>
           {plan.cadence}

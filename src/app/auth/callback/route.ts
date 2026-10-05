@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requestOrigin, safeNextPath } from "@/lib/supabase/origin";
+import { isReferralSource } from "@/lib/referral-sources";
 import { createRouteHandlerClient } from "@/lib/supabase/route";
 
 /**
@@ -77,8 +78,6 @@ export async function GET(request: NextRequest) {
  * swallowed: attribution is never worth breaking a sign-in over, and the
  * column may simply not exist until the migration has run.
  */
-const SOURCE_KEYS = new Set(["facebook", "tiktok", "instagram", "youtube", "google", "friend", "other"]);
-
 async function recordReferralSource(
   request: NextRequest,
   redirect: NextResponse,
@@ -90,7 +89,7 @@ async function recordReferralSource(
   redirect.cookies.set("vrs-src", "", { path: "/", maxAge: 0 });
   if (!userId) return;
   const source = decodeURIComponent(raw);
-  if (!SOURCE_KEYS.has(source)) return;
+  if (!isReferralSource(source)) return;
   try {
     await supabase.from("users").update({ referral_source: source }).eq("id", userId).is("referral_source", null);
   } catch {

@@ -17,6 +17,7 @@ import {
   unseenFollowUps,
 } from "@/lib/followups";
 import { usePreferences } from "@/lib/usePreferences";
+import { playChime } from "@/lib/chime";
 
 /** A cheap, referentially stable snapshot of the two keys we care about.
  *  useSyncExternalStore re-reads this on every subscription event, so it has to
@@ -91,6 +92,16 @@ export default function FollowUpBell({
     if (!open) return;
     markFollowUpsSeen(list.map((a) => a.id));
   }, [open, list]);
+
+  // A soft chime when something NEW lands while the tab is open. The first
+  // non-null snapshot only sets the baseline — reloading a page that already
+  // has three reminders must not ding three times.
+  const chimeBaseline = useRef<number | null>(null);
+  useEffect(() => {
+    if (raw === null) return;
+    if (chimeBaseline.current !== null && unread > chimeBaseline.current) playChime();
+    chimeBaseline.current = unread;
+  }, [raw, unread]);
 
   useEffect(() => {
     if (!open) return;

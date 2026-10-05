@@ -71,8 +71,8 @@ export const PLANS: Plan[] = [
     id: 'creator',
     name: 'Creator',
     price: null,
-    cadence: 'by application',
-    blurb: 'For VAs who already teach. Bring the skill, we handle hosting and payments.',
+    cadence: 'not open yet',
+    blurb: 'For VAs who already teach. Bring the skill, we handle hosting and payments. Opening later — this is what it will look like.',
     features: [
       'Everything in Pro',
       'Host and sell your own courses',

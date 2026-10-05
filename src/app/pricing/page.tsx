@@ -30,7 +30,7 @@ const FAQ = [
   },
   {
     q: 'Can I get paid to teach here?',
-    a: 'That is the Creator plan. If you already run a skill for clients, apply and we will talk. You keep 90% of what your course earns.',
+    a: 'That will be the Creator plan: host your own course and keep 90% of what it earns. It is not open yet — the card on this page shows what is coming.',
   },
 ];
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import NichePicker from "@/components/NichePicker";
 import CoverLetterRulesFields from "@/components/settings/CoverLetterRulesFields";
+import PushToggle from "@/components/settings/PushToggle";
 import { cleanUrl, parseRules, sameRules } from "@/lib/cover-letter-rules";
 import { RESUME_BUILDER_TEMPLATES } from "@/lib/resume-builder-templates";
 import {
@@ -312,8 +313,8 @@ export default function SettingsForm({ initial }: { initial: Preferences }) {
         {/* 5. notifications */}
         <Section
           step="5"
-          title="In-app notifications"
-          blurb="The bell in the header, counting anything that has gone quiet. Turn it off for a quieter week."
+          title="Notifications"
+          blurb="The bell in the header for follow-ups, and push alerts to this device when new jobs land."
         >
           <button
             type="button"
@@ -350,6 +351,8 @@ export default function SettingsForm({ initial }: { initial: Preferences }) {
               />
             </span>
           </button>
+
+          <PushToggle />
         </Section>
       </div>
 

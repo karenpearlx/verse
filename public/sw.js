@@ -21,7 +21,7 @@
  * Bump SW_VERSION to roll every cache at once.
  */
 
-const SW_VERSION = 'v2';
+const SW_VERSION = 'v3';
 const SHELL = `ally-shell-${SW_VERSION}`;
 const STATIC = `ally-static-${SW_VERSION}`;
 const ASSETS = `ally-assets-${SW_VERSION}`;
@@ -62,6 +62,46 @@ self.addEventListener('activate', (event) => {
 // Let the page tell a waiting worker to take over immediately.
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
+});
+
+/* ----------------------------- push notifications ------------------------ */
+
+// Payloads come from our own senders (the subscribe route's welcome push and
+// the daily job digest), always JSON: { title, body, url, tag }.
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    /* an unparseable push still shows something rather than nothing */
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Verse', {
+      body: data.body || '',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/maskable-192.png',
+      tag: data.tag || 'verse',
+      data: { url: data.url || '/jobs' },
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const client of windows) {
+        if ('focus' in client) {
+          await client.focus();
+          if ('navigate' in client) await client.navigate(url);
+          return;
+        }
+      }
+      await self.clients.openWindow(url);
+    })()
+  );
 });
 
 function cacheable(response) {
