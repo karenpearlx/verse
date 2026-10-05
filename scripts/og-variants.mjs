@@ -110,7 +110,7 @@ const B = `
 
   <g font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="26">
     <rect x="64" y="452" rx="26" width="232" height="52" fill="#2a6a5c"/>
-    <text x="180" y="487" text-anchor="middle" fill="#ffffff">900+ live jobs</text>
+    <text x="180" y="487" text-anchor="middle" fill="#ffffff">35,000+ jobs</text>
     <rect x="312" y="452" rx="26" width="230" height="52" fill="#ffffff" stroke="#e3dccf" stroke-width="2"/>
     <text x="427" y="487" text-anchor="middle" fill="#1c1a17">21 courses</text>
     <rect x="558" y="452" rx="26" width="268" height="52" fill="#ffffff" stroke="#e3dccf" stroke-width="2"/>

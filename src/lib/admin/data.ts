@@ -3,6 +3,7 @@ import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NICHES } from '@/lib/cover-letter-templates';
 import { referralSourceLabel } from '@/lib/referral-sources';
+import { COURSES_INDEX } from '@/lib/deep-courses/index-meta';
 import { RESUME_TEMPLATES } from '@/lib/resume';
 import { COURSES } from '@/lib/courses';
 import type {
@@ -881,6 +882,83 @@ export async function readTemplates(db: SupabaseClient): Promise<TemplatesRespon
     stored,
     tags,
     editable: present.includes(TEMPLATES_TABLE),
+  };
+}
+
+/* ---------------------------------------------------------- course completions */
+
+export type CourseCompletionRow = {
+  slug: string;
+  title: string;
+  completions: number;
+  avgRating: number;
+  lastAt: string;
+};
+
+export type CourseCompletionsResponse = {
+  /** false when the course_feedback migration has not been run yet */
+  ready: boolean;
+  totals: { completions: number; avgRating: number | null };
+  courses: CourseCompletionRow[];
+  recent: { slug: string; title: string; rating: number; signedIn: boolean; at: string }[];
+};
+
+/**
+ * Finished courses, from the "How did it go?" star ratings — the card only
+ * appears after every module is marked done, so each row is a completion.
+ * Reads with the service client: course_feedback has RLS on and no policies.
+ */
+export async function readCourseCompletions(db: SupabaseClient): Promise<CourseCompletionsResponse> {
+  const { data, error } = await db
+    .from('course_feedback')
+    .select('slug,rating,user_id,created_at')
+    .order('created_at', { ascending: false })
+    .limit(2_000);
+
+  if (error) {
+    if (!isMissingTable(error)) throw error;
+    return { ready: false, totals: { completions: 0, avgRating: null }, courses: [], recent: [] };
+  }
+
+  type Raw = { slug: string; rating: number; user_id: string | null; created_at: string };
+  const raw = (data ?? []) as Raw[];
+
+  const deepTitle = (slug: string) =>
+    COURSES_INDEX.cards.find((c) => c.slug === slug)?.title ?? slug;
+
+  const bySlug = new Map<string, { ratings: number[]; lastAt: string }>();
+  for (const row of raw) {
+    const entry = bySlug.get(row.slug) ?? { ratings: [], lastAt: row.created_at };
+    entry.ratings.push(row.rating);
+    if (row.created_at > entry.lastAt) entry.lastAt = row.created_at;
+    bySlug.set(row.slug, entry);
+  }
+
+  const courses: CourseCompletionRow[] = [...bySlug.entries()]
+    .map(([slug, { ratings, lastAt }]) => ({
+      slug,
+      title: deepTitle(slug),
+      completions: ratings.length,
+      avgRating: Math.round((ratings.reduce((n, r) => n + r, 0) / ratings.length) * 10) / 10,
+      lastAt,
+    }))
+    .sort((a, b) => b.completions - a.completions);
+
+  const avgAll = raw.length
+    ? Math.round((raw.reduce((n, r) => n + r.rating, 0) / raw.length) * 10) / 10
+    : null;
+
+  return {
+    ready: true,
+    totals: { completions: raw.length, avgRating: avgAll },
+    courses,
+    recent: raw.slice(0, 25).map((row) => ({
+      slug: row.slug,
+      title: deepTitle(row.slug),
+      rating: row.rating,
+      signedIn: Boolean(row.user_id),
+      at: row.created_at,
+    })),
   };
 }
 

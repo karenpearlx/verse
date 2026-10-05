@@ -5,6 +5,7 @@ import type { StoredTemplate, TemplateKind, TemplatesResponse } from '@/lib/admi
 import { useAdminResource } from './useAdminResource';
 import CategoriesManager from './CategoriesManager';
 import FeedbackPanel from './FeedbackPanel';
+import CourseCompletionsPanel from './CourseCompletionsPanel';
 
 import {
   Dialog,
@@ -19,13 +20,14 @@ import {
   when,
 } from './ui';
 
-type TabId = TemplateKind | 'tags' | 'feedback';
+type TabId = TemplateKind | 'tags' | 'feedback' | 'completions';
 
 const TABS: { id: TabId; label: string; blurb: string }[] = [
   { id: 'cover_letter', label: 'Cover letters', blurb: 'Niche letters offered in the builder.' },
   { id: 'resume', label: 'Resumes', blurb: 'Layouts the exporter can render.' },
   { id: 'tags', label: 'Categories & tags', blurb: 'Skills attached to indexed listings.' },
   { id: 'feedback', label: 'Course feedback', blurb: 'What readers said about each lesson.' },
+  { id: 'completions', label: 'Completions', blurb: 'Who finished a course, and the stars they left.' },
 ];
 
 type Draft = { id: string | null; kind: TemplateKind; name: string; slug: string; body: string };
@@ -39,7 +41,7 @@ export default function ContentSection() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const active = TABS.find((entry) => entry.id === tab)!;
-  const kind: TemplateKind = tab === 'tags' || tab === 'feedback' ? 'cover_letter' : tab;
+  const kind: TemplateKind = tab === 'tags' || tab === 'feedback' || tab === 'completions' ? 'cover_letter' : tab;
   const builtins = data?.builtins.filter((entry) => entry.kind === kind) ?? [];
   const stored = data?.stored.filter((entry) => entry.kind === kind) ?? [];
   const editable = Boolean(data?.editable);
@@ -117,7 +119,7 @@ export default function ContentSection() {
             {entry.label}
           </button>
         ))}
-        {tab === 'feedback' ? null : (
+        {tab === 'feedback' || tab === 'completions' ? null : (
           <button type="button" className="ad-btn ml-auto" onClick={reload} disabled={refreshing}>
             {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
@@ -125,16 +127,17 @@ export default function ContentSection() {
       </div>
 
       {tab === 'feedback' ? <FeedbackPanel /> : null}
+      {tab === 'completions' ? <CourseCompletionsPanel /> : null}
 
-      {tab !== 'feedback' && error ? <ErrorState message={error} onRetry={reload} /> : null}
+      {tab !== 'feedback' && tab !== 'completions' && error ? <ErrorState message={error} onRetry={reload} /> : null}
 
-      {tab !== 'feedback' && loading && !data ? (
+      {tab !== 'feedback' && tab !== 'completions' && loading && !data ? (
         <div className="ad-panel p-5">
           <Skeleton rows={4} />
         </div>
       ) : null}
 
-      {tab !== 'feedback' && data ? (
+      {tab !== 'feedback' && tab !== 'completions' && data ? (
         <>
           {!editable ? (
             <Note tone="warn">
