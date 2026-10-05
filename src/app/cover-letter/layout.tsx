@@ -1,9 +1,9 @@
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Cover letter builder",
+  title: "VA Cover Letter Generator — Tailored in Minutes",
   description:
-    "Write a tailored cover letter for remote VA roles in minutes. Template or AI mode, with your profile and saved rules.",
+    "Write a tailored virtual assistant cover letter in minutes. Template or AI mode, with tone options and your saved profile.",
   path: "/cover-letter",
 });
 

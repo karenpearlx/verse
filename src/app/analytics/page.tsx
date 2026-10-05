@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { buildInsights, readApplicationRows } from '@/lib/insights';
 
 export const metadata: Metadata = {
-  title: 'Insights · Verse',
+  title: 'Insights',
   description: 'Reply rates, interview rates and where your applications actually land.',
   robots: { index: false, follow: false },
 };

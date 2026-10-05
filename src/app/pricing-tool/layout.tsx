@@ -1,9 +1,9 @@
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "VA rate calculator",
+  title: "Virtual Assistant Rate Calculator — What to Charge",
   description:
-    "Estimate a defendable hourly range for Filipino VA skills from collected listing data. Market estimates, not a live quote.",
+    "Work out a defendable hourly rate for Filipino virtual assistants, based on collected listing data for your skill and experience level.",
   path: "/pricing-tool",
 });
 

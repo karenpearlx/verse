@@ -7,7 +7,7 @@ import { FREE_COVER_LETTER_LIMIT, FREE_RESUME_LIMIT } from '@/lib/subscription';
 import { PRO_ACCESS_DAYS, PRO_PRICE_PESOS } from '@/lib/plans';
 
 export const metadata = {
-  title: 'Pricing — Verse',
+  title: 'Pricing — Free VA Tools, Pro for 30 Days',
   description: `Free plan for the board, tracker and rate check. Pro is ₱${PRO_PRICE_PESOS} for 30 days, prepaid — unlimited letters, exports and premium courses.`,
 };
 

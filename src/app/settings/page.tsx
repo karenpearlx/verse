@@ -11,7 +11,7 @@ import { readUserSettings } from '@/lib/settings';
 import { readSubscription } from '@/lib/subscription';
 
 export const metadata: Metadata = {
-  title: 'Settings · Verse',
+  title: 'Settings',
   description: 'Follow-up reminders, default templates and notifications.',
   robots: { index: false, follow: false },
 };

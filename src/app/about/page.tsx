@@ -6,7 +6,7 @@ import Reveal from "@/components/Reveal";
 import GradientBg from "@/components/GradientBg";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About Verse — Built for Filipino Virtual Assistants",
   description:
     "Why Verse exists: one place for Filipino VAs to find work, learn the job, and know what to charge. Free plan and Pro — no agency in the middle.",
 };

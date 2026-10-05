@@ -6,7 +6,7 @@ import GradientBg from "@/components/GradientBg";
 import { TRACK_ONE } from "@/lib/courses";
 
 export const metadata = {
-  title: "Track 01 — Before you apply — Verse",
+  title: "Before You Apply — Free VA Starter Track",
   description:
     "The four lessons to do before you send a single application: the work, the niche, the setup, the desk.",
 };

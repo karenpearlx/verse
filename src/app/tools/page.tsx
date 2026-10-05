@@ -6,9 +6,9 @@ import Reveal from "@/components/Reveal";
 import GradientBg from "@/components/GradientBg";
 
 export const metadata: Metadata = {
-  title: "Tools",
+  title: "Free Virtual Assistant Tools — Resume, Rates & Tracker",
   description:
-    "The Verse toolkit: rate check, interview prep, resume builder, cover letter builder, the follow-up writer and the application tracker. Free plan plus Pro.",
+    "Free VA tools in one place: rate calculator, resume builder, cover letter generator, interview prep, follow-up writer and application tracker.",
 };
 
 /**

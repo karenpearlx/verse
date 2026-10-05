@@ -7,7 +7,7 @@ import { readApplications, suggestJobs } from '@/lib/dashboard';
 import type { Profile } from '@/lib/profile';
 
 export const metadata: Metadata = {
-  title: 'Dashboard · Verse',
+  title: 'Dashboard',
   description: 'Your applications, profile, courses and matching jobs in one place.',
   robots: { index: false, follow: false },
 };

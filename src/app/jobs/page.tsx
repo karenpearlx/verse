@@ -3,9 +3,9 @@ import { pageMetadata } from "@/lib/seo";
 import JobsBoard from "./JobsBoard";
 
 export const metadata = pageMetadata({
-  title: "VA job board",
+  title: "Virtual Assistant Jobs — Remote VA Job Board",
   description:
-    "Remote VA jobs from OnlineJobs.ph, RemoteOK, and We Work Remotely in one feed. Filter by source, search by skill, and open the original listing to apply.",
+    "Thousands of remote virtual assistant jobs from OnlineJobs.ph, RemoteOK, and We Work Remotely in one free board. Filter by skill, check the pay, and apply at the source.",
   path: "/jobs",
 });
 

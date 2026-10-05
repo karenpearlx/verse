@@ -38,14 +38,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (deep) {
     const card = COURSES_INDEX.cards.find((c) => c.slug === slug);
     return {
-      title: `${deep.title} — Verse`,
+      // The root layout template appends "· Verse"; adding the brand here too
+      // would double it up in the tab and in search results. Course titles end
+      // with a stylistic period that reads badly mid-sentence, so strip it.
+      title: `${deep.title.replace(/\.+$/, "")} Course — Virtual Assistant Training`,
       description: card?.blurb,
     };
   }
   const course = courseBySlug(slug);
-  if (!course) return { title: "Course not found — Verse" };
+  if (!course) return { title: "Course not found" };
   return {
-    title: `${course.title} — Verse`,
+    title: `${course.title.replace(/\.+$/, "")} Course — Virtual Assistant Training`,
     description: course.blurb,
   };
 }

@@ -9,9 +9,9 @@ import { hasPaidAccess, readSubscription } from "@/lib/subscription";
 import DeepCourseIndex from "@/components/deep/DeepCourseIndex";
 
 export const metadata = {
-  title: "Courses — Verse",
+  title: "Virtual Assistant Courses — Free VA Training in 21 Skills",
   description:
-    "Twenty-one written VA courses with worked examples, exercises, rate benchmarks, videos and a glossary — free foundations plus premium courses for every skill on the job board.",
+    "Interactive virtual assistant courses with quizzes, worked examples, rate benchmarks and tool guides — free foundations plus premium tracks for every skill on the job board.",
 };
 
 /** The lock state depends on the session, so this page is never cached. */

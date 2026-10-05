@@ -63,7 +63,7 @@ export default async function Home() {
           </p>
 
           <RevealWords
-            text="Your VA career, all in one place"
+            text="Virtual assistant jobs, and the career they grow into"
             as="h1"
             className="display-xl mt-5 max-w-4xl"
             dot
@@ -74,7 +74,7 @@ export default async function Home() {
 
           <div className="rise mt-8" style={{ animationDelay: "230ms" }}>
             <p className="lede max-w-lg">
-              Find jobs, learn the skills, know your worth. Everything a VA needs - beginner or pro - in one place.
+              Find real remote virtual assistant jobs, learn the skills, know your worth. Everything a VA needs — beginner or pro — in one place.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">

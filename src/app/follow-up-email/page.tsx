@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { hasPaidAccess, readSubscription } from '@/lib/subscription';
 
 export const metadata = {
-  title: 'Follow-up email writer — Verse',
+  title: 'Follow-Up Email Writer for Job Applications',
   description: 'Write the follow-up that gets answered instead of ignored. Included with Verse Pro.',
   robots: { index: true, follow: true },
 };

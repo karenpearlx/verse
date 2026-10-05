@@ -10,9 +10,9 @@ import { createClient } from '@/lib/supabase/server';
 import { hasPaidAccess, readSubscription } from '@/lib/subscription';
 
 export const metadata = {
-  title: 'Interview prep — Verse',
+  title: 'Virtual Assistant Interview Questions & Practice',
   description:
-    'Practise real remote interview questions, out loud, and get written feedback on your answer. Included with Verse Pro.',
+    'Practise real VA interview questions — general and role-specific — out loud, and get written feedback on your answer. Included with Verse Pro.',
 };
 
 /** The tool is gated on the session, so this page can never be cached. */

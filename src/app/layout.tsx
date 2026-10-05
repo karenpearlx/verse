@@ -25,11 +25,11 @@ const body = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://vrsfd.com"),
   title: {
-    default: "Verse — Every VA opportunity. One place.",
+    default: "Virtual Assistant Jobs, Courses & Tools for Filipino VAs — Verse",
     template: "%s · Verse",
   },
   description:
-    "Learn the work, price it properly, and find real remote jobs. Built for Filipino virtual assistants.",
+    "Browse 35,000+ remote virtual assistant jobs, learn in-demand VA skills with interactive courses, check your rate, and build a resume that gets replies. Made for Filipino virtual assistants.",
   applicationName: "Verse",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -49,9 +49,9 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Verse — Every VA opportunity. One place.",
+    title: "Virtual Assistant Jobs, Courses & Tools for Filipino VAs — Verse",
     description:
-      "Learn the work, price it properly, and find real remote jobs. Built for Filipino virtual assistants.",
+      "Browse 35,000+ remote virtual assistant jobs, learn in-demand VA skills, check your rate, and build a resume that gets replies.",
     siteName: "Verse",
     type: "website",
     url: "https://vrsfd.com",
@@ -59,9 +59,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verse — Every VA opportunity. One place.",
+    title: "Virtual Assistant Jobs, Courses & Tools for Filipino VAs — Verse",
     description:
-      "Learn the work, price it properly, and find real remote jobs. Built for Filipino virtual assistants.",
+      "Browse 35,000+ remote virtual assistant jobs, learn in-demand VA skills, check your rate, and build a resume that gets replies.",
     images: ["/og-image.png"],
   },
   formatDetection: { telephone: false },

@@ -10,7 +10,7 @@ import { readProfile } from '@/lib/profile-store';
 import { readSubscription } from '@/lib/subscription';
 
 export const metadata: Metadata = {
-  title: 'Profile · Verse',
+  title: 'Profile',
   description: 'Your VA profile: rates, specialities, portfolio links and availability.',
   robots: { index: false, follow: false },
 };
