@@ -90,8 +90,8 @@ export default async function Home() {
                   />
                 </svg>
               </Link>
-              <Link href="/pricing-tool" className="btn btn-ghost">
-                Check your rate
+              <Link href="/courses" className="btn btn-ghost">
+                Browse courses
               </Link>
             </div>
           </div>
