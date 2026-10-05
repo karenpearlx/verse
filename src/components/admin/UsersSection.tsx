@@ -223,6 +223,7 @@ export default function UsersSection() {
                     <tr>
                       <th>Account</th>
                       <th>Joined</th>
+                      <th>Heard from</th>
                       <th className="ad-right">Apps</th>
                       <th className="ad-right">Resumes</th>
                       <th className="ad-right">Letters</th>
@@ -254,6 +255,13 @@ export default function UsersSection() {
                           <span className="block text-xs" style={{ color: 'var(--color-faint)' }}>
                             last write {when(user.lastActiveAt)}
                           </span>
+                        </td>
+                        <td data-label="Heard from">
+                          {user.source ? (
+                            <Tag>{user.source}</Tag>
+                          ) : (
+                            <span style={{ color: 'var(--color-faint)' }}>—</span>
+                          )}
                         </td>
                         <td className="ad-right font-semibold" data-label="Apps">
                           {num(user.applications)}

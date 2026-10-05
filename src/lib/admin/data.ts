@@ -697,17 +697,20 @@ export async function readUsers(db: SupabaseClient, query = ''): Promise<UsersRe
   if (users !== null) {
     // Signup sparkline pulls only the last 30 days and only the column the
     // chart needs. It goes out alongside the two counters rather than after.
-    const [weekly, monthly, recentSignupsResult, statusProbe] = await Promise.all([
+    const [weekly, monthly, recentSignupsResult, statusProbe, sourceProbe] = await Promise.all([
       safeCount(db, 'users', { column: 'created_at', from: since7 }),
       safeCount(db, 'users', { column: 'created_at', from: since30 }),
       db.from('users').select('created_at').gte('created_at', since30).order('created_at', { ascending: false }).limit(5_000),
       // Moderation columns are optional: the console works without them and
       // says so, rather than throwing a 500 at somebody who has not run the SQL.
       db.from('users').select('status').limit(1),
+      // Same deal for referral_source: a dash until its migration has been run.
+      db.from('users').select('referral_source').limit(1),
     ]);
     signups7d = weekly.value;
     signups30d = monthly.value;
     moderation = !statusProbe.error;
+    const hasSource = !sourceProbe.error;
     const recentSignups = recentSignupsResult.data;
     const buckets = new Map(emptyDays(30).map((day) => [day, 0]));
     for (const row of (recentSignups ?? []) as { created_at: string }[]) {
@@ -716,9 +719,10 @@ export async function readUsers(db: SupabaseClient, query = ''): Promise<UsersRe
     }
     signupTimeline = [...buckets.entries()].map(([date, count]) => ({ date, count }));
 
-    const columns = moderation
-      ? 'id,email,created_at,updated_at,status,suspended_at,suspended_reason,subscription_tier'
-      : 'id,email,created_at,updated_at,subscription_tier';
+    const columns =
+      (moderation
+        ? 'id,email,created_at,updated_at,status,suspended_at,suspended_reason,subscription_tier'
+        : 'id,email,created_at,updated_at,subscription_tier') + (hasSource ? ',referral_source' : '');
 
     let list = db
       .from('users')
@@ -741,6 +745,7 @@ export async function readUsers(db: SupabaseClient, query = ''): Promise<UsersRe
       suspended_at?: string | null;
       suspended_reason?: string | null;
       subscription_tier?: string | null;
+      referral_source?: string | null;
     };
     const raw = (data ?? []) as unknown as Raw[];
     const ids = raw.map((row) => row.id);
@@ -778,6 +783,7 @@ export async function readUsers(db: SupabaseClient, query = ''): Promise<UsersRe
       suspendedAt: row.suspended_at ?? null,
       suspendedReason: row.suspended_reason ?? null,
       plan: (row.subscription_tier as 'free' | 'pro' | 'creator') ?? 'free',
+      source: row.referral_source ? referralLabel(row.referral_source) : null,
     }));
   }
 

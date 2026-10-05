@@ -56,6 +56,7 @@ export default function ReferralSourceModal() {
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<ReferralSourceId | null>(null);
   const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const hidden = HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const signedIn = ready && status === 'in' && Boolean(user);
@@ -93,18 +94,26 @@ export default function ReferralSourceModal() {
   const save = async () => {
     if (!picked || !user) return;
     setSaving(true);
+    setFailed(false);
     try {
-      // Supabase returns errors instead of throwing: only record "answered"
-      // once the row is really written, so the answer is never silently lost.
-      const { error } = await createClient()
-        .from('users')
-        .update({ referral_source: picked })
-        .eq('id', user.id);
-      if (error) return; // keep the modal up; Save comes back for another try
+      // Saved through a server route (service key) because browsers cannot
+      // update public.users directly under RLS. Only mark "answered" once the
+      // server confirms the write, so the answer is never silently lost.
+      const res = await fetch('/api/referral-source', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ source: picked }),
+      });
+      if (!res.ok) {
+        setFailed(true);
+        return; // keep the modal up; Save comes back for another try
+      }
       markDone(user.id);
       setOpen(false);
     } catch {
-      // Keep the modal up; the button comes back and they can tap Save again.
+      // Offline or mid-deploy: keep the modal up so they can tap Save again.
+      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -161,6 +170,11 @@ export default function ReferralSourceModal() {
         >
           {saving ? 'Saving…' : 'Save'}
         </button>
+        {failed ? (
+          <p className="mt-2 text-center text-sm font-semibold" style={{ color: '#a04020' }} role="alert">
+            That didn&rsquo;t save — please tap Save again.
+          </p>
+        ) : null}
       </div>
     </div>
   );

@@ -132,6 +132,8 @@ export type UserRow = {
   suspendedAt: string | null;
   suspendedReason: string | null;
   plan: 'free' | 'pro' | 'creator';
+  /** "Where did you hear about us?" answer, as a label. Null = not answered. */
+  source: string | null;
 };
 export type UsersResponse = {
   provisioning: Provisioning;
