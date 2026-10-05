@@ -34,6 +34,14 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@dnd-kit/core", "@dnd-kit/sortable", "@dnd-kit/utilities"],
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders,
+      },
+    ];
+  },
   async redirects() {
     return [
       // One canonical host: www serves a valid certificate (added on Vercel)
@@ -44,19 +52,7 @@ const nextConfig: NextConfig = {
         destination: "https://vrsfd.com/:path*",
         permanent: true,
       },
-    ];
-  },
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-    ];
-  },
-  async redirects() {
-    // These niche tracks were replaced by the longer written versions.
-    return [
+      // These niche tracks were replaced by the longer written versions.
       { source: "/courses/seo-for-vas", destination: "/courses/seo-specialist", permanent: true },
       {
         source: "/courses/social-media-management",
