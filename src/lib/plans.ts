@@ -63,7 +63,6 @@ export const PLANS: Plan[] = [
       'Unlimited resume exports',
       'Unlimited saved jobs',
       'Every premium course',
-      'New jobs 24 hours before free accounts',
       'AI interview prep with written feedback',
       'Follow-up email writer',
     ],

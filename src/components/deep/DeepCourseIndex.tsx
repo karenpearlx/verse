@@ -82,11 +82,18 @@ function Card({ c, paid }: { c: DeepCourseCard; paid: boolean }) {
           ))}
         </ul>
 
+        {/* This row stacks above the card's stretched-link overlay, so the
+            call to action must be a real link — a bare span here swallows
+            the tap and goes nowhere (the old mobile "Start does nothing" bug). */}
         <div className="relative mt-auto flex items-center justify-between gap-3 pt-5">
           <p className="text-[0.8125rem] text-muted">{c.duration}</p>
-          <span className="text-sm font-semibold text-teal-deep">
-            {locked ? `Read ${flags?.previewCount ?? 3} free →` : 'Start'}
-          </span>
+          <Link
+            href={`/courses/${c.slug}`}
+            className="tap -m-2 p-2 text-sm font-semibold text-teal-deep hover:text-teal"
+            aria-label={`${locked ? 'Preview' : 'Start'} ${c.title}`}
+          >
+            {locked ? `Read ${flags?.previewCount ?? 3} free →` : 'Start →'}
+          </Link>
         </div>
       </div>
     </li>

@@ -50,19 +50,7 @@ export type JobsQuery = {
   sort?: JobSort;
   page?: number;
   pageSize?: number;
-  /**
-   * Pro perk: listings scraped in the last 24 hours are held back unless this
-   * is true. The caller decides from the requester's subscription.
-   */
-  earlyAccess?: boolean;
 };
-
-/** How long fresh listings stay Pro-only. */
-export const EARLY_ACCESS_HOURS = 24;
-
-function earlyAccessCutoff(): string {
-  return new Date(Date.now() - EARLY_ACCESS_HOURS * 60 * 60 * 1000).toISOString();
-}
 
 export type JobsPageResult = {
   jobs: Job[];
@@ -85,15 +73,9 @@ function applyFilters(
   // PostgREST filter builders are not exported as a stable public type.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query: any,
-  { q, source, sort, freshCutoff }: { q: string; source: string; sort: JobSort; freshCutoff?: string },
+  { q, source, sort }: { q: string; source: string; sort: JobSort },
 ) {
   let next = query.eq('is_active', true);
-
-  // Non-Pro readers only see listings older than the early-access window.
-  // Each .or() is its own PostgREST param, so this ANDs with the search .or().
-  if (freshCutoff) {
-    next = next.or(`scraped_at.is.null,scraped_at.lt.${freshCutoff}`);
-  }
 
   if (source !== 'all') {
     next = next.in('source', [...sourceGroup(source)]);
@@ -129,14 +111,12 @@ export async function fetchJobsPage(
   const source = input.source && input.source !== 'all' ? input.source : 'all';
   const sort: JobSort = input.sort === 'oldest' || input.sort === 'paid' ? input.sort : 'newest';
   const supabase = client ?? (typeof window === 'undefined' ? publicJobsClient() : jobsClient());
-  const freshCutoff = input.earlyAccess ? undefined : earlyAccessCutoff();
 
   const ascending = sort === 'oldest';
 
   const countKeys = ['all', 'olj', 'remoteok', 'wwr'] as const;
   const countPromises = countKeys.map(async (key) => {
     let query = supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('is_active', true);
-    if (freshCutoff) query = query.or(`scraped_at.is.null,scraped_at.lt.${freshCutoff}`);
     if (key !== 'all') query = query.in('source', [...sourceGroup(key)]);
     const { count, error } = await query;
     if (error) throw error;
@@ -146,7 +126,7 @@ export async function fetchJobsPage(
   // Filtered total first so we can clamp page before fetching rows.
   const totalQuery = applyFilters(
     supabase.from('jobs').select('id', { count: 'exact', head: true }),
-    { q, source, sort, freshCutoff },
+    { q, source, sort },
   );
   const [{ count: filteredCount, error: totalError }, ...countEntries] = await Promise.all([
     totalQuery,
@@ -162,7 +142,7 @@ export async function fetchJobsPage(
 
   let { data, error } = await applyFilters(
     supabase.from('jobs').select(LIST_COLUMNS),
-    { q, source, sort, freshCutoff },
+    { q, source, sort },
   )
     .order('posted_at', { ascending, nullsFirst: false })
     .order('scraped_at', { ascending })
@@ -171,7 +151,7 @@ export async function fetchJobsPage(
   if (error && isMissingSalaryRaw(error)) {
     ({ data, error } = await applyFilters(
       supabase.from('jobs').select(LEGACY_LIST_COLUMNS),
-      { q, source, sort, freshCutoff },
+      { q, source, sort },
     )
       .order('posted_at', { ascending, nullsFirst: false })
       .order('scraped_at', { ascending })
